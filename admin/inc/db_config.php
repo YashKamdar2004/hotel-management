@@ -21,4 +21,24 @@
         return $data;
     }
 
+    function select($sql,$values,$datatypes){
+        $con = $GLOBALS['con'];
+        if($stmt = mysqli_prepare($con,$sql)){
+            mysqli_stmt_bind_param($stmt,$datatypes,...$values); //... splat operator
+            if(mysqli_stmt_execute($stmt)){
+               $res = mysqli_stmt_get_result($stmt);
+               return $res;
+            }
+            else{
+                die("Query cannot be executed - Select");
+            }
+            mysqli_stmt_close($stmt);
+            return $res; 
+        }  
+        else
+        {
+            die("Query cannot be prepared - Select");
+        }
+    }
+
 ?>
