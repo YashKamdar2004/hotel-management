@@ -1,4 +1,5 @@
 <?php
+    require('inc/essentials.php');
     require('inc/db_config.php');
 ?>
 
@@ -50,15 +51,13 @@
 
             $res = select($query,$values,"ss");
             if($res->num_rows==1){
-                echo "got user";
+                $row = mysqli_fetch_assoc($res); 
+                session_start();
+                $_SESSION['adminLogin'] = true;
+                $_SESSION['adminId'] = $row['sr_no'];
             }
             else{
-                echo <<<alert
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <strong>Holy guacamole!</strong> You should check in on some of those fields below.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                alert;
+                alert('error','Login failed - Invalid Credentials!');
             }
         }
     ?>
