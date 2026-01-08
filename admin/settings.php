@@ -83,13 +83,75 @@
                     </div>
                 </div>
 
+                <!-- Contact details section -->
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="card-title m-0">Contact Settings</h5>
+                            <button type="button" class="btn btn-dark shadow-none btn-sm" data-bs-toggle="modal" data-bs-target="#contacts-s">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col lg-6">
+                                <div class="mb-4">
+                                    <h6 class="card-subtitle mb-1 fw-bold">Address</h6>
+                                    <p class="card-text" id="address"></p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="card-subtitle mb-1 fw-bold">Google Map</h6>
+                                    <p class="card-text" id="gmap"></p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="card-subtitle mb-1 fw-bold">Phone Numbers</h6>
+                                    <p class="card-text mb-1">
+                                        <i class="bi bi-telephone-fill"></i>
+                                        <span id="pn1"></span>
+                                    </p>
+                                    <p class="card-text">
+                                        <i class="bi bi-telephone-fill"></i>
+                                        <span id="pn2"></span>
+                                    </p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="card-subtitle mb-1 fw-bold">E-mail</h6>
+                                    <p class="card-text" id="email"></p>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="mb-4">
+                                    <h6 class="card-subtitle mb-1 fw-bold">Social Links</h6>
+                                    <p class="card-text mb-1">
+                                        <i class="bi bi-facebook me-1"></i>
+                                        <span id="fb"></span>
+                                    </p>
+                                    <p class="card-text mb-1">
+                                        <i class="bi bi-instagram me-1"></i>
+                                        <span id="insta"></span>
+                                    </p>
+                                    <p class="card-text">
+                                        <i class="bi bi-twitter me-1"></i>
+                                        <span id="tw"></span>
+                                    </p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="card-subtitle mb-1 fw-bold">iFrame</h6>
+                                    <iframe id="iframe" class="border p-2 w-100" loading="lazy"></iframe>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
     <?php require('inc/scripts.php');?>
     <script>
-        let general_data;
+        let general_data, contacts_data;
 
         let general_s_form = document.getElementById('general_s_form');
         let site_title_inp = document.getElementById('site_title_inp');
@@ -184,8 +246,28 @@
             xhr.send('upd_shutdown='+val);
         }
 
+        function get_contacts()
+        {
+
+            let contacts_p_id = ['address','gmap','pn1','pn2','email','fb','insta','tw'];
+            let iframe = document.getElementById('iframe');
+            
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST","ajax/settings_crud.php",true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            
+            xhr.onload = function(){                
+                contacts_data = JSON.parse(this.responseText);
+                console.log(contacts_data);
+            }
+
+
+            xhr.send('get_contacts');
+        }   
+
         window.onload = function(){
             get_general();
+            get_contact();
         }
 
     </script>
