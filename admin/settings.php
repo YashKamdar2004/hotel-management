@@ -41,24 +41,24 @@
 
                 <div class="modal fade" id="general-s" data-bs-backdrop="static" data-bs-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                     <div class="modal-dialog">
-                        <form>
+                        <form id="general_s_form">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title">General Settings</h5>
                                 </div>
                                 <div class="modal-body">
                                     <div class="mb-3">
-                                        <label class="form-label">Site Title</label>
-                                        <input type="text" name="site_title" id="site_title_inp" class="form-control shadow-none">
+                                        <label class="form-label fw-bold">Site Title</label>
+                                        <input type="text" name="site_title" id="site_title_inp" class="form-control shadow-none" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">About Us</label>
-                                        <textarea name="site_about" id="site_about_inp" class="form-control shadow-none" rows="6"></textarea>
+                                        <label class="form-label fw-bold">About Us</label>
+                                        <textarea name="site_about" id="site_about_inp" class="form-control shadow-none" rows="6" required></textarea>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" onclick="site_title.value = general_data.site_title, site_about.value = general_data.site_about" class="btn text-secondary shadow-none" data-bs-dismiss="modal">CANCEL</button>
-                                    <button type="button" onclick="upd_general(site_title.value,site_about.value)" class="btn custom-bg text-white shadow-none">SUBMIT</button>
+                                    <button type="submit" class="btn custom-bg text-white shadow-none">SUBMIT</button>
                                 </div>
                             </div>
                         </form>
@@ -91,13 +91,15 @@
     <script>
         let general_data;
 
+        let general_s_form = document.getElementById('general_s_form');
+        let site_title_inp = document.getElementById('site_title_inp');
+        let site_about_inp = document.getElementById('site_about_inp');
+
+
         function get_general()
         {
             let site_title = document.getElementById('site_title');
             let site_about = document.getElementById('site_about');
-
-            let site_title_inp = document.getElementById('site_title_inp');
-            let site_about_inp = document.getElementById('site_about_inp');
 
             let shutdown_toggle = document.getElementById('shutdown-toggle');
 
@@ -127,6 +129,12 @@
 
             xhr.send('get_general');
         }
+
+        general_s_form.addEventListener('submit',function(e){
+            e.preventDefault();
+            upd_general(site_title_inp.value,site_about_inp.value);
+
+        })
 
         function upd_general(site_title_val,site_about_val)
         {
