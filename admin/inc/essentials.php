@@ -69,5 +69,15 @@ function uploadImage($image,$folder){
 
 }
 
+function deleteImage($img, $folder)
+{
+    if(unlink(UPLOAD_IMAGE_PATH.$folder.$img))
+    {
+        return true;
+    }
+    else{
+        return false;
+    }
+}
 
 ?>
