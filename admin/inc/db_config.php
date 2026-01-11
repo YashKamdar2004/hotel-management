@@ -21,6 +21,13 @@
         return $data;
     }
 
+    function selectAll($table)
+    {
+        $con = $GLOBALS['con'];
+        $res = mysqli_query($con,"SELECT * FROM $table");
+        return $res;
+    }
+
     function select($sql,$values,$datatypes)
     {
         $con = $GLOBALS['con'];

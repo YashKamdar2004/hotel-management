@@ -227,6 +227,7 @@
 
                         <div class="row" id="team-data">
                         </div>
+
                     </div>
                 </div>
 
@@ -453,29 +454,58 @@
             xhr.open("POST","ajax/settings_crud.php",true);
 
             xhr.onload = function(){
-                console.log(this.responseText);
-            //    var myModal = document.getElementById('general-s'); 
-            //    var modal = bootstrap.Modal.getInstance(myModal);
-            //    modal.hide();
+               
+                var myModal = document.getElementById('team-s'); 
+                var modal = bootstrap.Modal.getInstance(myModal);
+                modal.hide();
 
-            //    if(this.responseText == 1)
-            //    {
-            //        alert('success','Changes saved!');
-            //        get_general();
-            //    }
-            //    else
-            //    {
-            //        alert('error','No changes made!');
-            //    }
-
+                if(this.responseText == 'inv_img')
+                {
+                    alert('error','Only JPG and PNG images are allowed!');
+                }
+                else if(this.responseText == 'inv_size')
+                {
+                    alert('error','Image should be less than 2MB!');
+                }
+                else if(this.responseText == 'upd_failed')
+                {
+                    alert('error','Image upload failed. Server Down!');
+                }
+                else{
+                    alert('success','New member added');
+                    member_name_inp.value = '';
+                    member_picture_inp.value = '';
+                    get_members();
+                }
             }
 
             xhr.send(data);
         }
+
+        function get_members()
+        {
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST","ajax/settings_crud.php",true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            
+            xhr.onload = function(){
+                document.getElementById('team-data').innerHTML = this.responseText;
+            }
+
+
+            xhr.send('get_members');
+        }
         
+        function rem_member(val)
+        {
+
+        }
+
         window.onload = function(){
             get_general();
             get_contacts();
+            get_members();
         }
 
     </script>
