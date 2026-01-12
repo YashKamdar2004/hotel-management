@@ -2,6 +2,7 @@
 integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
 <script>
+
     function alert(type,msg){
         let bs_class = (type == 'success') ? 'alert-success' : 'alert-danger';
         let element = document.createElement('div');
@@ -14,4 +15,22 @@ integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxV
 
         document.body.append(element);
     }
+
+    function setActive()
+    {
+        navbar = document.getElementById('dashboard-menu');
+        let a_tags = navbar.getElementsByTagName('a');
+
+        for(i=0; i<a_tags.length; i++)
+        {
+            let file = a_tags[i].href.split('/').pop();
+            let file_name = file.split('.')[0];
+
+            if(document.location.href.indexOf(file_name)>=0){
+            a_tags[i].classList.add('active');
+        }
+    }
+  }
+  setActive();
+
 </script>
