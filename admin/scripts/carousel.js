@@ -13,7 +13,7 @@
             data.append('add_image', '');
 
             let xhr = new XMLHttpRequest();
-            xhr.open("POST","ajax/settings_crud.php",true);
+            xhr.open("POST","ajax/carousel_crud.php",true);
 
             xhr.onload = function(){
                
@@ -36,7 +36,7 @@
                 else{
                     alert('success','New Image added');
                     carousel_picture_inp.value = '';
-                    add_carousel();
+                    get_carousel();
                 }
             }
 
@@ -47,29 +47,29 @@
         {
 
             let xhr = new XMLHttpRequest();
-            xhr.open("POST","ajax/settings_crud.php",true);
+            xhr.open("POST","ajax/carousel_crud.php",true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             
             xhr.onload = function(){
-                document.getElementById('team-data').innerHTML = this.responseText;
+                document.getElementById('carousel-data').innerHTML = this.responseText;
             }
 
 
-            xhr.send('add_carousel');
+            xhr.send('get_carousel');
         }
         
-        function rem_member(val)
+        function rem_image(val)
         {
             let xhr = new XMLHttpRequest();
-            xhr.open("POST","ajax/settings_crud.php",true);
+            xhr.open("POST","ajax/carousel_crud.php",true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             
             xhr.onload = function()
             {
                 if(this.responseText == 1)
                 {
-                    alert('success','Member removed!');
-                    add_carousel();
+                    alert('success','Image removed!');
+                    get_carousel();
                 }
                 else
                 {
@@ -77,10 +77,9 @@
                 }
             }
 
-            xhr.send('rem_member='+val);      
+            xhr.send('rem_image='+val);      
         }
 
         window.onload = function(){
-            add_carousel();
+            get_carousel();
         }
-
