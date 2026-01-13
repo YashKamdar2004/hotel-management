@@ -30,3 +30,9 @@
     background-color: var(--teal_hover);
     border-color: var(--teal_hover);
 }
+
+.custom-alert{
+    position: fixed;
+    top: 80px;
+    right: 25px; 
+}
