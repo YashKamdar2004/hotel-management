@@ -2,6 +2,47 @@
     require('inc/essentials.php');
     require('inc/db_config.php');
     adminLogin(); 
+
+    if(isset($_GET['seen']))
+    {
+        $frm_data = filteration($_GET);
+
+        if($frm_data['seen'] == 'all'){
+
+        }
+        else{
+            $q = "UPDATE `user_queries` SET `seen`=? WHERE `sr_no`=?";
+            $values = [1,$frm_data['seen']];
+            if(update($q,$values,'ii'))
+            {
+                alert('success','Marked as read');
+            }
+            else
+            {
+                alert('error','Operation Failed!');
+            }
+        }
+    }
+    if(isset($_GET['del']))
+    {
+        $frm_data = filteration($_GET);
+
+        if($frm_data['del'] == 'all'){
+
+        }
+        else{
+            $q = "DELETE FROM `user_queries` WHERE `sr_no`=?";
+            $values = [$frm_data['del']];
+            if(delete($q,$values,'i'))
+            {
+                alert('success','Message Deleted!');
+            }
+            else
+            {
+                alert('error','Operation Failed!');
+            }
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,6 +63,15 @@
             
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-body">
+
+                        <div class="text-end mb-4">
+                            <a href="?seen=all" class="btn btn-dark rounded-pill shadow-none btn-sm">
+                                <i class="bi bi-check-all"></i> Mark all as read
+                            </a>
+                            <a href="?del=all" class="btn btn-danger rounded-pill shadow-none btn-sm">
+                                <i class="bi bi-trash"></i> Delete all
+                            </a>
+                        </div>
     
                         <div class="table-responsive-md" style="height: 450px; overflow-y: scroll;">
                             <table class="table table-hover border">
@@ -47,8 +97,10 @@
                                             $seen = '';
                                             if($row['seen'] != 1)
                                             {
-                                                $seen = "<a href=''>Mark as read</a>";
+                                                $seen = "<a href='?seen=$row[sr_no]' class='btn btn-sm rounded-pill btn-primary me-2'>Mark as read</a>";
                                             }
+                                            $seen.="<a href='?del=$row[sr_no]' class='btn btn-sm rounded-pill btn-danger'>Delete</a>"; //mt-2
+
                                             echo<<<query
                                                 <tr>
                                                     <td>$i</td>
@@ -57,6 +109,7 @@
                                                     <td>$row[subject]</td>
                                                     <td>$row[message]</td>
                                                     <td>$row[date]</td>
+                                                    <td>$seen</td>
                                                 </tr>
                                             query;
                                             $i++;
