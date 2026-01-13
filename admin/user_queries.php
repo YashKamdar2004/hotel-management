@@ -1,4 +1,5 @@
 <?php
+
     require('inc/essentials.php');
     require('inc/db_config.php');
     adminLogin(); 
@@ -8,7 +9,16 @@
         $frm_data = filteration($_GET);
 
         if($frm_data['seen'] == 'all'){
-
+             $q = "UPDATE `user_queries` SET `seen`=?";
+            $values = [1];  
+            if(update($q,$values,'i'))
+            {
+                alert('success','Marked all as read');
+            }
+            else
+            {
+                alert('error','Operation Failed!');
+            }
         }
         else{
             $q = "UPDATE `user_queries` SET `seen`=? WHERE `sr_no`=?";
@@ -23,12 +33,21 @@
             }
         }
     }
+
     if(isset($_GET['del']))
     {
         $frm_data = filteration($_GET);
 
         if($frm_data['del'] == 'all'){
-
+            $q = "DELETE FROM `user_queries`";
+            if(mysqli_query($con,$q))
+            {
+                alert('success','All messages deleted!');
+            }
+            else
+            {
+                alert('error','Operation Failed!');
+            }
         }
         else{
             $q = "DELETE FROM `user_queries` WHERE `sr_no`=?";
@@ -43,6 +62,7 @@
             }
         }
     }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -97,9 +117,9 @@
                                             $seen = '';
                                             if($row['seen'] != 1)
                                             {
-                                                $seen = "<a href='?seen=$row[sr_no]' class='btn btn-sm rounded-pill btn-primary me-2'>Mark as read</a>";
+                                                $seen = "<a href='?seen=$row[sr_no]' class='btn btn-sm rounded-pill btn-primary'>Mark as read</a>";
                                             }
-                                            $seen.="<a href='?del=$row[sr_no]' class='btn btn-sm rounded-pill btn-danger'>Delete</a>"; //mt-2
+                                            $seen.="<a href='?del=$row[sr_no]' class='btn btn-sm rounded-pill btn-danger mt-1'>Delete</a>"; 
 
                                             echo<<<query
                                                 <tr>
