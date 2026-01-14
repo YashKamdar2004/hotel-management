@@ -144,7 +144,73 @@
         </div>
     </div>
 
+
+    <!-- Feature modal -->
+
+    <div class="modal fade" id="feature-s" data-bs-backdrop="static" data-bs-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="feature_s_form">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add Feature</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Name</label>
+                            <input type="text" name="feature_name" class="form-control shadow-none" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" class="btn text-secondary shadow-none" data-bs-dismiss="modal">CANCEL</button>
+                        <button type="submit" class="btn custom-bg text-white shadow-none">SUBMIT</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <?php require('inc/scripts.php');?>
+
+
+    <script>
+
+        let feature_s_form = document.getElementById('feature_s_form');
+
+        feature_s_form.addEventListener('submit',function(e){
+            e.preventDefault();
+            add_feature();
+        });
+
+        function add_feature(){
+            let data = new FormData();
+            data.append('name',feature_s_form.elements['feature_name'].value);
+            data.append('add_feature', '');
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST","ajax/features_facilities.php",true);
+
+            xhr.onload = function(){
+               
+                var myModal = document.getElementById('feature-s'); 
+                var modal = bootstrap.Modal.getInstance(myModal);
+                modal.hide();
+
+                if(this.responseText == 1)
+                {
+                    alert('success','New feature added');
+                    feature_s_form.elements['feature_name'].value = '';
+                    // get_members();
+                }
+                else{
+                   alert('error,Server Down!')
+                }
+            }
+
+            xhr.send(data);
+        }
+
+    </script>
+
 
 </body>
 </html>
