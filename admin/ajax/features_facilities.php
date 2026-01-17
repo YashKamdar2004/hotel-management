@@ -52,7 +52,7 @@
     {
         $frm_data = filteration($_POST);
 
-        $img_r = uploadImage($_FILES['picture'],ABOUT_FOLDER);
+        $img_r = uploadSVGImage($_FILES['icon'],FEATURES_FOLDER);
 
         if($img_r == 'inv_img'){
             echo $img_r;
@@ -64,10 +64,35 @@
             echo $img_r;
         }
         else{
-            $q = "INSERT INTO `team_details`(`name`, `picture`) VALUES (?,?)";
-            $values = [$frm_data['name'],$img_r];
-            $res = insert($q,$values,'ss');
+            $q = "INSERT INTO `facilities` (`icon`,`name`, `description`) VALUES (?,?,?)";
+            $values = [$img_r,$frm_data['name'],$frm_data['desc']];
+            $res = insert($q,$values,'sss');
             echo $res;
         }
-    } 
+    }
+    
+    if(isset($_POST['get_facilities']))
+    {
+        $res = selectAll('facilities');
+        $i=1;
+        $path = FEATURES_IMG_PATH;
+        
+        while($row = mysqli_fetch_assoc($res))
+        {
+            echo <<<data
+                <tr>
+                    <td>$i</td>
+                    <td><img src="$path$row[icon]" width="30px"></td>
+                    <td>$row[name]</td>
+                    <td>$row[description]</td>
+                    <td>
+                        <button type="button" onclick="rem_feature($row[id])" class="btn btn-danger btn-sm shadow-none">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            data;
+            $i++;
+        }
+    }
 ?>

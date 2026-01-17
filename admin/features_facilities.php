@@ -95,7 +95,7 @@
     
                         <div class="table-responsive-md" style="height: 350px; overflow-y: scroll;">
                             <table class="table table-hover border">
-                                <thead class="sticky-top">
+                                <thead>
                                     <tr class="bg-dark text-light">
                                         <th scope="col">#</th>
                                         <th scope="col">Name</th>
@@ -125,7 +125,7 @@
     
                         <div class="table-responsive-md" style="height: 350px; overflow-y: scroll;">
                             <table class="table table-hover border">
-                                <thead class="sticky-top">
+                                <thead>
                                     <tr class="bg-dark text-light">
                                         <th scope="col">#</th>
                                         <th scope="col">Icon</th>
@@ -262,6 +262,7 @@
 
         window.onload = function(){
             get_features();
+            get_facilities();
         }
 
         function rem_feature(val)
@@ -292,8 +293,8 @@
         function add_facility(){
             let data = new FormData();
             data.append('name',facility_s_form.elements['facility_name'].value);
-            data.append('name',facility_s_form.elements['facility_icon'].files[0]);
-            data.append('name',facility_s_form.elements['facility_desc'].value);
+            data.append('icon',facility_s_form.elements['facility_icon'].files[0]);
+            data.append('desc',facility_s_form.elements['facility_desc'].value);
             data.append('add_facility', '');
 
             let xhr = new XMLHttpRequest();
@@ -331,6 +332,21 @@
             e.preventDefault();
             add_facility();
         });
+
+        function get_facilities()
+        {
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST","ajax/features_facilities.php",true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            
+            xhr.onload = function(){
+                document.getElementById('facilities-data').innerHTML = this.responseText;
+            }
+
+
+            xhr.send('get_facilities');
+        }
 
     </script>
 
