@@ -130,7 +130,7 @@
                                         <th scope="col">#</th>
                                         <th scope="col">Icon</th>
                                         <th scope="col">Name</th>
-                                        <th scope="col">Description</th>
+                                        <th scope="col" width="40%">Description</th>
                                         <th scope="col">Action</th>
                                     </tr>
                                 </thead>
@@ -260,11 +260,6 @@
             xhr.send('get_features');
         }
 
-        window.onload = function(){
-            get_features();
-            get_facilities();
-        }
-
         function rem_feature(val)
         {
             let xhr = new XMLHttpRequest();
@@ -321,7 +316,7 @@
                 else{
                     alert('success','New facility added');
                     facility_s_form.reset();
-                    //get_members();
+                    get_facilities();   
                 }
             }
 
@@ -346,6 +341,11 @@
 
 
             xhr.send('get_facilities');
+        }
+
+        window.onload = function(){
+            get_features();
+            get_facilities();
         }
 
     </script>

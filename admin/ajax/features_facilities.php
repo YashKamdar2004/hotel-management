@@ -80,13 +80,13 @@
         while($row = mysqli_fetch_assoc($res))
         {
             echo <<<data
-                <tr>
+                <tr class="align-middle">
                     <td>$i</td>
-                    <td><img src="$path$row[icon]" width="30px"></td>
+                    <td><img src="$path$row[icon]" width="100px"></td>
                     <td>$row[name]</td>
                     <td>$row[description]</td>
                     <td>
-                        <button type="button" onclick="rem_feature($row[id])" class="btn btn-danger btn-sm shadow-none">
+                        <button type="button" onclick="rem_facility($row[id])" class="btn btn-danger btn-sm shadow-none">
                             <i class="bi bi-trash"></i> Delete
                         </button>
                     </td>
