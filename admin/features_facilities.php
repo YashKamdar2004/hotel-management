@@ -343,6 +343,31 @@
             xhr.send('get_facilities');
         }
 
+        function rem_facility(val)
+        {
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST","ajax/features_facilities.php",true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            
+            xhr.onload = function()
+            {
+                if(this.responseText == 1)
+                {
+                    alert('success','Facility removed!');
+                    get_facilities();
+                }
+                else if(this.responseText == 'room_added'){
+                    alert('error','Facility is added in room!');
+                }
+                else
+                {
+                    alert('error','Server down!');
+                }
+            }
+
+            xhr.send('rem_facility='+val);      
+        }
+
         window.onload = function(){
             get_features();
             get_facilities();

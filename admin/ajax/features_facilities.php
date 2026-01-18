@@ -52,7 +52,7 @@
     {
         $frm_data = filteration($_POST);
 
-        $img_r = uploadSVGImage($_FILES['icon'],FEATURES_FOLDER);
+        $img_r = uploadSVGImage($_FILES['icon'],FACILITIES_FOLDER);
 
         if($img_r == 'inv_img'){
             echo $img_r;
@@ -75,7 +75,7 @@
     {
         $res = selectAll('facilities');
         $i=1;
-        $path = FEATURES_IMG_PATH;
+        $path = FACILITIES_IMG_PATH;
         
         while($row = mysqli_fetch_assoc($res))
         {
@@ -93,6 +93,27 @@
                 </tr>
             data;
             $i++;
+        }
+    }
+
+    if(isset($_POST['rem_facility']))
+    {
+        $frm_data = filteration($_POST);
+        $values = [$frm_data['rem_facility']];
+
+
+        $pre_q = "SELECT * FROM `facilities` WHERE `id`=?";
+        $res = select($pre_q,$values,'i');
+        $img = mysqli_fetch_assoc($res);
+
+        if(deleteImage($img['icon'],FACILITIES_FOLDER)){
+            $q = "DELETE FROM `facilities` WHERE `id`=?";
+            $res = delete($q,$values,'i');
+            echo $res;
+        }
+        else
+        {
+            echo 0;
         }
     }
 ?>
