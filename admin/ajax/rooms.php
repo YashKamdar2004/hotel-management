@@ -23,5 +23,17 @@
         $room_id = mysqli_insert_id($con);
 
         $q2 = "INSERT INTO `room_facilities` (`room_id`, `facilities_id`) VALUES (?,?)";
+
+        if($stmt = mysqli_prepare($con,$q2))
+        {
+            foreach($facilities as $f){
+                mysqli_stmt_bind_param($stmt,'ii',$room_id,$f);
+                mysqli_stmt_execute($stmt);
+            }
+            mysqli_stmt_close($stmt);
+        }
+        else{
+
+        }
     }
 ?>
