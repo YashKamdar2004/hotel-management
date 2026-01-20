@@ -185,28 +185,31 @@ function add_rooms()
             }
         });
 
-    //    let xhr = new XMLHttpRequest();
-    //    xhr.open("POST","ajax/features_facilities.php",true);
+        data.append('features',JSON.stringify(features));
+        data.append('facilities',JSON.stringify(facilities));
 
-    //    xhr.onload = function()
-    //    {
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST","ajax/rooms.php",true);
+
+        xhr.onload = function()
+        {
             
-    //        var myModal = document.getElementById('feature-s'); 
-    //        var modal = bootstrap.Modal.getInstance(myModal);
-    //        modal.hide();
+            var myModal = document.getElementById('add-room'); 
+            var modal = bootstrap.Modal.getInstance(myModal);
+            modal.hide();
 
-    //        if(this.responseText == 1)
-    //       {
-    //            alert('success','New feature added');
-    //            feature_s_form.elements['feature_name'].value = '';
-    //            get_features();
-    //        }
-    //        else{
-    //            alert('error,Server Down!')
-    //        }
-    //    }
+            if(this.responseText == 1)
+           {
+                alert('success','New room added');
+                add_room_form.reset();
+                
+            }
+            else{
+                alert('error,Server Down!')
+            }
+        }
 
-   // xhr.send(data);
+         xhr.send(data);
 }
     </script>
 
