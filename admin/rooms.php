@@ -150,7 +150,7 @@
 
     <?php require('inc/scripts.php');?>
     <script>
-        let add_room_form = doucment.getElementById('add_room_form');
+        let add_room_form = document.getElementById('add_room_form');
 
         add_room_form.addEventListener('submit',function(e){
             e.preventDefault();
