@@ -105,7 +105,15 @@
     {
         $frm_data = filteration($_POST);
 
-        $q = "UPDATE `rooms` SET `status`=? WHERE ";
+        $q = "UPDATE `rooms` SET `status`=? WHERE `id`=?";
+        $v = [$frm_data['value'],$frm_data['toggle_status']];
+
+        if(update($q,$v,'ii')){
+            echo 1;
+        }
+        else{
+            echo 0;
+        }
     }
 
 ?>
