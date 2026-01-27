@@ -92,11 +92,7 @@
                     <td>₹$row[price]</td>
                     <td>$row[quantity]</td>
                     <td>$status</td>
-                    <td>
-                        <button type='button' onclick='edit_details($row[id])' class='btn btn-primary shadow-none btn-sm' data-bs-toggle='modal' data-bs-target='#edit-room'>
-                            <i class='bi bi-pencil-square'></i> 
-                        </button>
-                    </td>
+                    <td>Buttons</td>
                 </tr>
             ";
             $i++;
@@ -105,35 +101,6 @@
         echo $data;
     }
 
-    if(isset($_POST['get_room']))
-    {
-        $frm_data = filteration($_POST);
-        $res1 = select("SELECT * FROM `rooms` WHERE `id`=?",[$frm_data['get_room']],'i');
-        $res2 = select("SELECT * FROM `room_features ` WHERE `room_id`=?",[$frm_data['get_room']],'i');
-        $res3 = select("SELECT * FROM `room_facilities` WHERE `id`=?",[$frm_data['get_room']],'i');
-
-        $roomdata = mysqli_fetch_assoc($res1);
-        $features = [];
-        $facilities = [];
-
-        if(mysqli_num_rows($res2)>0){
-            while($row = mysqli_fetch_assoc($res2)){
-                array_push($features,$row['features_id']);
-            }
-        }
-
-        if(mysqli_num_rows($res3)>0){
-            while($row = mysqli_fetch_assoc($res3)){
-                array_push($facilities,$row['facilities_id']);
-            }
-        }
-
-        $data = ["roomdata" => $roomdata, "features" => $features, "facilities" => $facilities];
-
-        $data = json_encode($data);
-
-        echo $data;
-    }
 
     if(isset($_POST['toggle_status']))
     {
