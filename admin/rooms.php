@@ -487,18 +487,19 @@
             
                 if(this.responseText == 'inv_img')
                 {
-                    alert('error','Only JPG, WEBP or PNG images are allowed!');
+                    alert('error','Only JPG, WEBP or PNG images are allowed!','image-alert');
                 }
                 else if(this.responseText == 'inv_size')
                 {
-                    alert('error','Image should be less than 2MB!');
+                    alert('error','Image should be less than 2MB!','image-alert');
                 }
                 else if(this.responseText == 'upd_failed')
                 {
-                    alert('error','Image upload failed. Server Down!');
+                    alert('error','Image upload failed. Server Down!','image-alert');
                 }
                 else{
                     alert('success','New Image added!','image-alert');
+                    room_images(add_image_form.elements['room_id'].value,document.querySelector("#room-images .modal-title").innerText);
                     add_image_form.reset();
                 }
             }
@@ -510,6 +511,43 @@
         {
             document.querySelector("#room-images .modal-title").innerText = rname;
             add_image_form.elements['room_id'].value = id;  
+            add_image_form.elements['image'].value = '';
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST","ajax/rooms.php",true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+            xhr.onload = function(){
+                document.getElementById('room-image-data').innerHTML = this.responseText;
+            }
+
+            xhr.send('get_room_images='+id);
+        }
+
+        function rem_image(img_id,room_id)
+        {
+            let data = new FormData();
+            data.append('image_id',img_id);
+            data.append('room_id',room_id);
+            data.append('rem_image', '');
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST","ajax/rooms.php",true);
+
+            xhr.onload = function(){
+            
+                if(this.responseText == 1)
+                {
+                    alert('success','Image Removed!','image-alert');
+                    room_images(room_id,document.querySelector("#room-images .modal-title").innerText);
+                }
+                else{
+                    alert('error','Image removal failed!','image-alert');
+                    
+                }
+            }
+
+            xhr.send(data);
         }
 
         window.onload = function(){
