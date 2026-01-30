@@ -243,6 +243,7 @@
                     <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div id="image-alert"></div>
                     <div class="border-bottom border-3 pb-3 mb-3">
                         <form id="add_image_form">
                             <label class="form-label fw-bold">Add Image</label>
@@ -480,7 +481,7 @@
             data.append('add_image', '');
 
             let xhr = new XMLHttpRequest();
-            xhr.open("POST","ajax/carousel_crud.php",true);
+            xhr.open("POST","ajax/rooms.php",true);
 
             xhr.onload = function(){
             
@@ -497,12 +498,18 @@
                     alert('error','Image upload failed. Server Down!');
                 }
                 else{
-                    alert('success','New Image added');
+                    alert('success','New Image added!','image-alert');
                     add_image_form.reset();
                 }
             }
 
             xhr.send(data);
+        }
+
+        function room_images(id,rname)
+        {
+            document.querySelector("#room-images .modal-title").innerText = rname;
+            add_image_form.elements['room_id'].value = id;  
         }
 
         window.onload = function(){

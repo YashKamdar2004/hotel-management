@@ -98,8 +98,8 @@
                         <button type='button' onclick='edit_details($row[id])' class='btn btn-primary shadow-none btn-sm' data-bs-toggle='modal' data-bs-target='#edit-room'>
                             <i class='bi bi-pencil-square'></i> 
                         </button>
-                        <button type='button' onclick='' class='btn btn-info shadow-none btn-sm' data-bs-toggle='modal' data-bs-target='#room-images'>
-                            <i class='bi bi-    images'></i> 
+                        <button type='button' onclick=\"room_images($row[id],'$row[name]')\" class='btn btn-info shadow-none btn-sm' data-bs-toggle='modal' data-bs-target='#room-images'>
+                            <i class='bi bi-images'></i> 
                         </button>
                     </td>
                 </tr>
@@ -205,7 +205,7 @@
         }    
     }
 
-    if(isset($_POST['add_image']))
+    if(isset($_POST['toggle_status']))
     {
         $frm_data = filteration($_POST);
 
@@ -220,11 +220,11 @@
         }
     }
 
-    if(isset($_POST['add_member']))
+    if(isset($_POST['add_image']))
     {
         $frm_data = filteration($_POST);
 
-        $img_r = uploadImage($_FILES['image'],ROOMS_FOLDER);
+        $img_r = uploadImage($_FILES['image'], ROOMS_FOLDER);
 
         if($img_r == 'inv_img'){
             echo $img_r;
@@ -236,11 +236,11 @@
             echo $img_r;
         }
         else{
-            $q = "INSERT INTO `team_details`(`name`, `picture`) VALUES (?,?)";
-            $values = [$frm_data['name'],$img_r];
-            $res = insert($q,$values,'ss');
+            $q = "INSERT INTO `room_images`(`room_id`, `image`) VALUES (?,?)";
+            $values = [$frm_data['room_id'],$img_r];
+            $res = insert($q,$values,'is');
             echo $res;
         }
-    } 
-
+    }
+    
 ?>
