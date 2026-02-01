@@ -41,71 +41,59 @@
   <div class="container">
     <div class="row">
 
-      <div class="col-12 my-5 px-4">
+      <div class="col-12 my-5 mb-4 px-4">
         <h2 class="fw-bold"><?php echo $room_data['name'] ?></h2>
-        <div>
-          
+        <div style="font-size: 14px;">
+          <a href="index.php" class="text-secondary text-decoration-none">HOME</a>
+          <span class="text-secondary"> > </span>
+          <a href="rooms.php" class="text-secondary text-decoration-none">ROOMS</a>
         </div>
       </div>
 
-      <div class="col-lg-3 col-md-12 mb-lg-0 mb-4 ps-4">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white rounded shadow">
-          <div class="container-fluid flex-lg-column align-items-stretch">
-            <h4 class="mt-2">FILTERS</h4>
+      <div class="col-lg-7 col-md-12 px-4">
+        <div id="roomCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            <?php
 
-            <button class="navbar-toggler shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#filterDropdown" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
+              $room_img = ROOMS_IMG_PATH."thumbnail.jpg";
 
-            <div class="collapse navbar-collapse flex-column align-items-stretch mt-2" id="filterDropdown">
+              $img_q = mysqli_query($con,"SELECT * FROM `room_images` 
+                WHERE `room_id`='$room_data[id]'");
 
-              <div class="border bg-light p-3 rounded mb-3">
-                <h5 class="mb-3" style="font-size: 18px;">CHECK AVAILABILITY</h5>
-                <label class="form-label">Check-in</label>
-                <input type="date" class="form-control shadow-none mb-3">
-                <label class="form-label">Check-out</label>
-                <input type="date" class="form-control shadow-none">
-              </div>
+              if(mysqli_num_rows($img_q)>0)
+              {
+                $active_class='active'; 
 
-              <div class="border bg-light p-3 rounded mb-3">
-                <h5 class="mb-3" style="font-size: 18px;">FACILITIES</h5>
+                while($img_res = mysqli_fetch_assoc($img_q))
+                {
+                  echo " <div class='carousel-item $active_class'>
+                      <img src='".ROOMS_IMG_PATH.$img_res['image']."' class='d-block w-100 rounded'>
+                    </div>
+                  ";
 
-                <div class="mb-2">
-                  <input type="checkbox" id="f1" class="form-check-input shadow-none me-1">
-                  <label class="form-check-label" for="f1">Facility one</label>
-                </div>
+                  $active_class='';
+                  
+                }
 
-                <div class="mb-2">
-                  <input type="checkbox" id="f2" class="form-check-input shadow-none me-1">
-                  <label class="form-check-label" for="f2">Facility two</label>
-                </div>
+              }
+              else{
+                echo " <div class='carousel-item active'>
+                  <img src='$room_img' class='d-block w-100'>
+                </div>";
+              }
 
-                <div class="mb-2">
-                  <input type="checkbox" id="f3" class="form-check-input shadow-none me-1">
-                  <label class="form-check-label" for="f3">Facility three</label>
-                </div>
-              </div>
-
-              <div class="border bg-light p-3 rounded mb-3">
-                <h5 class="mb-3" style="font-size: 18px;">GUESTS</h5>
-
-                <div class="d-flex">
-                  <div class="me-3">
-                    <label class="form-label">Adults</label>
-                    <input type="number" class="form-control shadow-none">
-                  </div>
-
-                  <div>
-                    <label class="form-label">Children</label>
-                    <input type="number" class="form-control shadow-none">
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
+            ?>
           </div>
-        </nav>
+          <button class="carousel-control-prev" type="button" data-bs-target="#roomCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#roomCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+        
       </div>
 
       <div class="col-lg-9 col-md-12 px-4">
