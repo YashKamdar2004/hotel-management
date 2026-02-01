@@ -84,6 +84,7 @@
       <div class="col-lg-9 col-md-12 px-4">
 
         <?php
+
           $room_res = select("SELECT * FROM `rooms` WHERE `status`=? AND `removed`=?",[1,0],'ii');
 
           while($room_data = mysqli_fetch_assoc($room_res))
@@ -97,7 +98,7 @@
             $features_data = "";
 
             while($fea_row = mysqli_fetch_assoc($fea_q)){
-              $features_data .="<span class='badge rounded-pill bg-light text-dark text-wrap'>
+              $features_data .="<span class='badge rounded-pill bg-light text-dark text-wrap me-1 mb-1'>
                   $fea_row[name]
                 </span>";
             }
@@ -111,7 +112,7 @@
             $facilities_data = "";
             
              while($fac_row = mysqli_fetch_assoc($fac_q)){
-              $facilities_data .="<span class='badge rounded-pill bg-light text-dark text-wrap'>
+              $facilities_data .="<span class='badge rounded-pill bg-light text-dark text-wrap me-1 mb-1'>
                   $fac_row[name]
                 </span>";
             }
@@ -177,6 +178,7 @@
             data;
 
           }
+
         ?>
 
         
