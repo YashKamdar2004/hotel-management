@@ -19,6 +19,10 @@ define('ROOMS_FOLDER','rooms/');
 define('USERS_FOLDER','users/');
 
 
+//sendgrip api key
+
+define('SENDGRID_API_KEY',"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");
+
 
 function adminLogin(){
     session_start();

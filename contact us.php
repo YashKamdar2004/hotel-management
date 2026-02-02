@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SkyLine Suites - CONTACT US</title>
 
   <?php require('inc/links.php'); ?>
+  <title><?php echo $settings_r['site_title'] ?> - CONTACT US</title>
 
   <style>
     .h-line{
