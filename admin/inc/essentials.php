@@ -110,4 +110,6 @@ function uploadSVGImage($image,$folder){
 
 }
 
+
+
 ?>
