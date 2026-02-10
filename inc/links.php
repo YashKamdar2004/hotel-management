@@ -18,6 +18,8 @@ integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLAS
 
 <?php
 
+session_start();
+
 require('admin/inc/db_config.php');
 require('admin/inc/essentials.php');
 

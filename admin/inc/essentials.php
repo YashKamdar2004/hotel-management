@@ -1,5 +1,11 @@
 <?php 
 
+require __DIR__ . '/../../vendor/autoload.php';
+
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
+$dotenv->load();
+
 //frontend purpose data
 
 define('SITE_URL','http://127.0.0.1/hotel-management/');
@@ -19,10 +25,11 @@ define('ROOMS_FOLDER','rooms/');
 define('USERS_FOLDER','users/');
 
 
-//sendgrip api key
+//sendgrid api key
 
-define('SENDGRID_API_KEY',"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");
-
+define('SENDGRID_API_KEY',$_ENV['SENDGRID_API_KEY']);
+define('SENDGRID_EMAIL',$_ENV['SENDGRID_EMAIL']);
+define('SENDGRID_NAME',$_ENV['SENDGRID_NAME']);
 
 function adminLogin(){
     session_start();
