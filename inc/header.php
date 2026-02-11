@@ -24,7 +24,23 @@
       </ul>
       <div class="d-flex">
         <?php
-          
+          if(isset($_SESSION['login']) && $_SESSION['login'] == true)
+          {
+            $path =  USERS_IMG_PATH;
+            echo<<<data
+              <div class="btn-group">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+                  <img src="$path$_SESSION[uPic]" style="width: 25px; height: 25px;" class="me-1">
+                  $_SESSION[uName]
+                </button>
+                <ul class="dropdown-menu dropdown-menu-lg-end">
+                  <li><button class="dropdown-item" type="button">Action</button></li>
+                  <li><button class="dropdown-item" type="button">Another action</button></li>
+                  <li><button class="dropdown-item" type="button">Something else here</button></li>
+                </ul>
+              </div>
+            data;
+          }
         ?>
         <button type="button" class="btn btn-outline-dark shadow-none me-lg-3 me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
             Login
