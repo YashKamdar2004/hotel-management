@@ -204,21 +204,25 @@ integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxV
     xhr.open("POST","ajax/login_register.php",true);
 
     xhr.onload = function(){
-      // if(this.responseText == 'inv_email_mob'){
-      //   alert('error',"Invalid Email or Mobile Number!");
-      // }
-      // else if(this.responseText == 'not_verified'){
-      //   alert('error',"Email is not verified!");
-      // }
-      // else if(this.responseText == 'inactive'){
-      //   alert('error',"Account Suspended! Please contact Admin...");
-      // }
-      // else if(this.responseText == 'invalid_pass'){
-      //   alert('error',"Incorrect Password!");
-      // }
-      // else{
-      //   window.location = window.location.pathname; 
-      // }
+      if(this.responseText == 'inv_email'){
+        alert('error',"Invalid Email!");
+      }
+      else if(this.responseText == 'not_verified'){
+        alert('error',"Email is not verified! Please Contact Admin");
+      }
+      else if(this.responseText == 'inactive'){
+        alert('error',"Account Suspended! Please contact Admin...");
+      }
+      else if(this.responseText == 'mail_failed'){
+        alert('error',"Cannot send email. Server Down!");
+      }
+      else if(this.responseText == 'upd_failed'){
+        alert('error',"Password reset failed. Server Down!");
+      }
+      else{
+        alert('success',"Reset link sent to email!");
+        forgot_form.reset(); 
+      }
     }
 
     xhr.send(data);
