@@ -173,8 +173,8 @@ if(isset($_POST['forgot_pass']))
                 echo 'mail_failed';
             }
             else{
-                $data = date("Y-m-d");
-                $query = mysqli_query($con,"UPDATE `user_cred` SET `token`=`$token`, `t_expire`=`$date` 
+                $date = date("Y-m-d");
+                $query = mysqli_query($con,"UPDATE `user_cred` SET `token`='$token', `t_expire`='$date'
                     WHERE `id`='$u_fetch[id]'");
 
                 if($query){
@@ -185,6 +185,26 @@ if(isset($_POST['forgot_pass']))
                 }
             }
         } 
+    }
+}
+
+if(isset($_POST['recover_user']))
+{
+    $data = filteration($_POST);
+
+    $enc_pass = password_hash($data['pass'],PASSWORD_BCRYPT);
+
+    $query = "UPDATE `user_cred` SET `password`=?, `token`=?, `t_expire`=?
+        WHERE `email`=? AND `token`=?";
+
+    $values = [$enc_pass,null,null,$data['email'],$data['token']];
+
+    if(update($query,$values,'sssss'))
+    {
+        echo 1;
+    }
+    else{
+        echo 'failed';
     }
 }
 

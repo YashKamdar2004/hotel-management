@@ -19,6 +19,7 @@ integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLAS
 <?php
 
 session_start();
+date_default_timezone_set("Asia/Kolkata");
 
 require('admin/inc/db_config.php');
 require('admin/inc/essentials.php');

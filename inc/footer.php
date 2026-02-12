@@ -217,7 +217,7 @@ integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxV
         alert('error',"Cannot send email. Server Down!");
       }
       else if(this.responseText == 'upd_failed'){
-        alert('error',"Password reset failed. Server Down!");
+        alert('error',"Password recovery failed. Server Down!");
       }
       else{
         alert('success',"Reset link sent to email!");
