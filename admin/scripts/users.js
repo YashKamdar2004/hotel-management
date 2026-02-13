@@ -1,4 +1,5 @@
-function get_users() {
+function get_users() 
+{
   let xhr = new XMLHttpRequest();
 
   xhr.open("POST", "ajax/users.php", true);
@@ -50,6 +51,20 @@ function remove_user(user_id) {
 
     xhr.send(data);
   }
+}
+
+function search_user(username)
+{
+  let xhr = new XMLHttpRequest();
+
+  xhr.open("POST", "ajax/users.php", true);
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+  xhr.onload = function () {
+    document.getElementById('users-data').innerHTML = this.responseText;
+  }
+
+  xhr.send('search_user&name='+username);
 }
 
 window.onload = function () {
