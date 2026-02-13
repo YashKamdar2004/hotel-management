@@ -28,9 +28,7 @@
                     <div class="card-body">
 
                       <div class="text-end mb-4">
-                            <!-- <button type="button" class="btn btn-dark shadow-none btn-sm" data-bs-toggle="modal" data-bs-target="#add-room">
-                                <i class="bi bi-plus-square"></i> Add
-                            </button> -->
+                            <input type="text" class="form-control shadow-none">
                         </div>  
     
                         <div class="table-responsive">
@@ -46,7 +44,7 @@
                                         <th scope="col">Verified</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Date</th>
-                                        <th scope="col">Status</th>
+                                        <th scope="col">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="users-data">

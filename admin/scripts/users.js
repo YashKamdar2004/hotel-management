@@ -11,46 +11,46 @@ function get_users() {
   xhr.send('get_users');
 }
 
-// function toggle_status(id, val) {
-//   let xhr = new XMLHttpRequest();
+function toggle_status(id, val) {
+  let xhr = new XMLHttpRequest();
 
-//   xhr.open("POST", "ajax/rooms.php", true);
-//   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.open("POST", "ajax/users.php", true);
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-//   xhr.onload = function () {
-//     if (this.responseText == 1) {
-//       alert('success', 'Status Toggled!');
-//       get_all_rooms();
-//     } else {
-//       alert('fail', 'Server Down!');
-//     }
-//   };
+  xhr.onload = function () {
+    if (this.responseText == 1) {
+      alert('success', 'Status Toggled!');
+      get_users();
+    } else {
+      alert('fail', 'Server Down!');
+    }
+  }
 
-//   xhr.send('toggle_status=' + id + '&value=' + val);
-// }
+  xhr.send('toggle_status=' + id + '&value=' + val);
+}
 
-// function remove_room(room_id) {
-//   if (confirm("Are you sure you want to delete this room?")) {
-//     let data = new FormData();
+function remove_user(user_id) {
+  if (confirm("Are you sure, you want to remove this user?")) {
+    let data = new FormData();
 
-//     data.append('room_id', room_id);
-//     data.append('remove_room', '');
+    data.append('user_id', user_id);
+    data.append('remove_user', '');
 
-//     let xhr = new XMLHttpRequest();
-//     xhr.open("POST", "ajax/rooms.php", true);
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "ajax/users.php", true);
 
-//     xhr.onload = function () {
-//       if (this.responseText == 1) {
-//         alert('success', 'Room removal success!');
-//         get_all_rooms();
-//       } else {
-//         alert('error', 'Room removal failed!');
-//       }
-//     };
+    xhr.onload = function () {
+      if (this.responseText == 1) {
+        alert('success', 'User Removed!');
+        get_users();
+      } else {
+        alert('error', 'User removal failed!');
+      }
+    }
 
-//     xhr.send(data);
-//   }
-// }
+    xhr.send(data);
+  }
+}
 
 window.onload = function () {
   get_users();
