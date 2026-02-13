@@ -107,8 +107,6 @@
 
 <h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">OUR ROOMS</h2>
 
-<!-- first card -->
-
 <div class="container">
   <div class="row">
   
@@ -162,7 +160,13 @@
             $book_btn = "";
 
             if(!$settings_r['shutdown']){
-              $book_btn = "<a href='#' class='btn btn-sm text-white custom-bg shadow-none'>Book Now</a>";
+              $login=0;
+              if(isset($_SESSION['login']) && $_SESSION['login'] == true)
+              {
+                $login=1;
+              }
+
+              $book_btn = "<button onclick='checkLoginToBook($login,$room_data[id])' class='btn btn-sm text-white custom-bg shadow-none'>Book Now</button>";
             }
 
             // print room card
@@ -202,6 +206,7 @@
                     </span> 
                   </div>
                   <div class="d-flex justify-content-evenly mb-2">
+                    $book_btn
                     <a href="room_details.php?id=$room_data[id]" class="btn btn-sm btn-outline-dark shadow-none">More Details</a>
                   </div>
                 </div>
@@ -211,7 +216,7 @@
 
           }
           
-        ?>
+    ?>
 
     <div class="col-lg-12 text-center mt-5">
       <a href="rooms.php" class="btn btn-sm btn-outline-dark rounded-0 fw-bold shadow-none">More Rooms >>></a>

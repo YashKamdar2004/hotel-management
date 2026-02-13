@@ -229,6 +229,17 @@ integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxV
 
   });
 
+  function checkLoginToBook(status,room_id)
+  {
+    if(status)
+    {
+      window.location.href='confirm_booking.php?id='+room_id;
+    }
+    else{
+      alert('error','Please login to book room!');
+    }
+  }
+
   setActive();
   
 </script>
