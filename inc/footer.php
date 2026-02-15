@@ -178,7 +178,13 @@ integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxV
         alert('error',"Incorrect Password!");
       }
       else{
-        window.location = window.location.pathname; 
+        let filerurl = window.location.href.split('/').pop().split('?').shift();
+        if(fileurl == 'room_details.php'){
+          window.location = window.location.href;
+        }
+        else{
+          window.location = window.location.pathname;
+        } 
       }
     }
 

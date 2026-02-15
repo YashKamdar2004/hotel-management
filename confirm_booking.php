@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <?php require('inc/links.php'); ?>
-  <title><?php echo $settings_r['site_title'] ?> - ROOM DETAILS</title>
+  <title><?php echo $settings_r['site_title'] ?> - CONFIRM BOOKING</title>
 
   <style>
     .h-line{
