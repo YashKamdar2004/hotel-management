@@ -109,7 +109,7 @@
                 <div class="row">
                   <div class="col-md-6 ps-0 mb-3">
                     <label class="form-label">Name</label>
-                    <input name="name" type="text" class="form-control shadow-none" required>
+                    <input name="name" type="text" class="form-control shadow-none" required> 
                   </div>
                   <div class="col-md-6 p-0 mb-3">
                     <label class="form-label">Email</label>
