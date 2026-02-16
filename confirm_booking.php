@@ -156,6 +156,11 @@
 
       if(checkin_val!='' && checkout_val!='')
       {
+
+        pay_info.classList.add('d-none');
+        pay_info.classList.replace('text-dark','text-danger');   
+        info_loader.classList.remove('d-none');
+
         let data = new FormData();
 
         data.append('check_availability','');
@@ -165,9 +170,10 @@
         let xhr = new XMLHttpRequest();
         xhr.open("POST","ajax/confirm_booking.php",true);
 
-        xhr.onload = function(){
+        xhr.onload = function()
+        {
           let data = JSON.parse(this.responseText);
-
+          if(data.status == )
         } 
 
         xhr.send(data);
