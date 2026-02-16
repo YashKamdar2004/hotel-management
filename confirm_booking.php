@@ -173,7 +173,27 @@
         xhr.onload = function()
         {
           let data = JSON.parse(this.responseText);
-          if(data.status == )
+
+          if(data.status == 'check_in_out_equal'){
+            pay_info.innerText =  "You cannot check-out on the same day!";
+          }
+          else if(data.status == 'check_out_earlier'){
+            pay_info.innerText =  "Check-out date is earlier than check-in date!";
+          }
+          else if(data.status == 'check_in_earlier'){
+            pay_info.innerText =  "Check-in date is earlier than today's date!";
+          }
+          else if(data.status == 'unavailable'){
+            pay_info.innerText =  "Room not available for this check-in date!";
+          }
+          else{
+            pay_info.innerHTML = "No. of Days: "+data.days+"<br>Total Amount to Pay: ₹"+data.payment;
+            pay_info.classList.replace('text-danger','text-dark');
+            booking_form.elements['pay_now'].removeAttribute('disabled');
+          }
+
+          pay_info.classList.remove('d-none');
+          info_loader.classList.add('d-none');
         } 
 
         xhr.send(data);
