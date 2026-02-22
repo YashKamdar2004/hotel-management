@@ -1,8 +1,6 @@
 <?php
 session_start();
 
-$user_id = $_SESSION['uId'];
-
 // If user directly tries to access page
 if (!isset($_GET['amount']) || !isset($_GET['room_id'])
 || !isset($_GET['checkin']) || !isset($_GET['checkout'])) {
@@ -14,10 +12,15 @@ $amount = $_GET['amount'];
 $room_id = $_GET['room_id'];
 $checkin = $_GET['checkin'];
 $checkout = $_GET['checkout'];
-
-$booking_id = "HB" . rand(10000, 99999);
-$txn_id = "TXN" . rand(100000, 999999);
-
+// Use IDs passed from payment page if available, otherwise generate new ones
+if (isset($_GET['booking_id']) && isset($_GET['txn_id'])) {
+    $booking_id = $_GET['booking_id'];
+    $txn_id = $_GET['txn_id'];
+}
+else {
+    $booking_id = "HB" . rand(10000, 99999);
+    $txn_id = "TXN" . rand(100000, 999999);
+}
 ?>
 
 <!DOCTYPE html>
@@ -76,7 +79,6 @@ $txn_id = "TXN" . rand(100000, 999999);
     </div>
 
 </div>
-
 
 </body>
 </html>
