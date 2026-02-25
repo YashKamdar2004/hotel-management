@@ -34,25 +34,48 @@
   <h2 class="fw-bold h-font text-center">ABOUT US</h2>
   <div class="h-line"></div>
   <p class="text-center mt-3">
-    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-    Atque dolorem quam <br> doloremque quae esse temporibus 
-    aspernatur, recusandae est omnis nemo!
+    <?php echo nl2br(htmlspecialchars($settings_r['site_about'])); ?>
   </p>
 </div>
 
 <div class="container">
   <div class="row justify-content-between align-items-center">
+    <?php
+      // Fetch additional about data if columns exist
+      $about_query = "SELECT * FROM `settings` WHERE `sr_no` = 1";
+      $about_res = mysqli_query($con, $about_query);
+      $about_data = mysqli_fetch_assoc($about_res);
+      
+      // Check if optional columns exist
+      $has_mission = isset($about_data['mission']) && $about_data['mission'] != '';
+      $has_vision = isset($about_data['vision']) && $about_data['vision'] != '';
+      $has_image = isset($about_data['about_image']) && $about_data['about_image'] != '';
+      
+      // Use about_image if exists, otherwise use default
+      $about_img = $has_image ? ABOUT_IMG_PATH . htmlspecialchars($about_data['about_image']) : 'images/about/about.jpg';
+    ?>
+    
     <div class="col-lg-6 col-md-5 mb-4 order-lg-1 order-md-1 order-2">
-      <h3 class="mb-3">Lorem ipsum dolor sit.</h3>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quia necessitatibus 
-        harum modi sint temporibus voluptatibus dignissimos!
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quia necessitatibus 
-        harum modi sint temporibus voluptatibus dignissimos!
-      </p>
+      <h3 class="mb-3">Welcome to <?php echo htmlspecialchars($settings_r['site_title']); ?></h3>
+      <p><?php echo nl2br(htmlspecialchars($settings_r['site_about'])); ?></p>
+      
+      <?php if($has_mission): ?>
+      <div class="mt-4">
+        <h5 class="fw-bold"><i class="bi bi-bullseye me-2"></i>Our Mission</h5>
+        <p><?php echo nl2br(htmlspecialchars($about_data['mission'])); ?></p>
+      </div>
+      <?php endif; ?>
+      
+      <?php if($has_vision): ?>
+      <div class="mt-4">
+        <h5 class="fw-bold"><i class="bi bi-eye me-2"></i>Our Vision</h5>
+        <p><?php echo nl2br(htmlspecialchars($about_data['vision'])); ?></p>
+      </div>
+      <?php endif; ?>
     </div>
+    
     <div class="col-lg-5 col-md-5 mb-4 order-lg-2 order-md-2 order-1">
-      <img src="images/about/about.jpg" class=w-100>
+      <img src="<?php echo $about_img; ?>" class="w-100 rounded shadow" alt="About Us">
     </div>
   </div>
 </div>
@@ -88,28 +111,38 @@
 
 <h3 class="my-5 fw-bold h-font text-center">MANAGEMENT TEAM</h3>
 
-
 <div class="container px-4">
-<!-- Swiper -->
-  <div class="swiper mySwiper">
-    <div class="swiper-wrapper mb-5">
-
-      <?php
-        $about_r = selectAll('team_details');
-        $path = ABOUT_IMG_PATH;
-
-        while($row = mysqli_fetch_assoc($about_r)){
-          echo<<<data
-            <div class="swiper-slide bg-white text-center overflow-hidden rounded">
-              <img src="$path$row[picture]" class="w-100">
-              <h5 class="mt-2">$row[name]</h5>
-            </div>
-          data;
-        }
-      ?>
-    </div>
-    <div class="swiper-pagination"></div>
-  </div>
+  <?php
+    // Fetch all team members (no status filter since column doesn't exist)
+    $team_query = "SELECT * FROM `team_details` ORDER BY `sr_no` ASC";
+    $team_res = mysqli_query($con, $team_query);
+    
+    if(mysqli_num_rows($team_res) > 0){
+      echo '<div class="swiper mySwiper">
+        <div class="swiper-wrapper mb-5">';
+      
+      $path = ABOUT_IMG_PATH;
+      while($row = mysqli_fetch_assoc($team_res)){
+        $team_name = htmlspecialchars($row['name']);
+        $team_pic = htmlspecialchars($row['picture']);
+        
+        echo <<<data
+          <div class="swiper-slide bg-white text-center overflow-hidden rounded">
+            <img src="$path$team_pic" class="w-100" alt="$team_name">
+            <h5 class="mt-2">$team_name</h5>
+          </div>
+        data;
+      }
+      
+      echo '</div>
+        <div class="swiper-pagination"></div>
+      </div>';
+    } else {
+      echo '<div class="text-center">
+        <p class="text-muted fs-5">Our team details will be updated soon.</p>
+      </div>';
+    }
+  ?>
 </div>
 
 

@@ -67,30 +67,34 @@
   <div class="row">
     <div class="col-lg-12 bg-white shadow p-4 rounded">
       <h5 class="mb-4">Check Booking Availability</h5>
-      <form>
+      <form id="availability-form" method="GET" action="rooms.php">
           <div class="row align-items-end">
             <div class="col-lg-3 mb-3">
               <label class="form-label" style="font-weight: 500;">Check-in</label>
-              <input type="date" class="form-control shadow-none">
+              <input type="date" name="checkin" id="checkin" class="form-control shadow-none" required>
             </div>
             <div class="col-lg-3 mb-3">
               <label class="form-label" style="font-weight: 500;">Check-out</label>
-              <input type="date" class="form-control shadow-none">
+              <input type="date" name="checkout" id="checkout" class="form-control shadow-none" required>
             </div>
             <div class="col-lg-3 mb-3">
               <label class="form-label" style="font-weight: 500;">Adult</label>
-              <select class="form-select shadow-none">
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
+              <select name="adults" class="form-select shadow-none" required>
+                <option value="">Select</option>
+                <option value="1">1 Adult</option>
+                <option value="2">2 Adults</option>
+                <option value="3">3 Adults</option>
+                <option value="4">4 Adults</option>
+                <option value="5">5 Adults</option>
               </select>
             </div>  
-              <div class="col-lg-2 mb-3">
+            <div class="col-lg-2 mb-3">
               <label class="form-label" style="font-weight: 500;">Children</label>
-              <select class="form-select shadow-none">
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
+              <select name="children" class="form-select shadow-none">
+                <option value="0">None</option>
+                <option value="1">1 Child</option>
+                <option value="2">2 Children</option>
+                <option value="3">3 Children</option>
               </select>
             </div>
             <div class="col-lg-1 mb-lg-3 mt-2">
@@ -255,66 +259,128 @@
 
 <h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">TESTIMONIALS</h2>
 
+<?php
+  // Get overall rating statistics
+  $rating_query = "SELECT AVG(rating) as avg_rating, COUNT(*) as total_reviews 
+                   FROM reviews WHERE review_status = 'approved'";
+  $rating_res = mysqli_query($con, $rating_query);
+  $rating_data = mysqli_fetch_assoc($rating_res);
+  
+  if($rating_data['total_reviews'] > 0){
+    $avg_rating = round($rating_data['avg_rating'], 1);
+    echo "<div class='text-center mb-4'>
+      <span class='badge bg-light text-dark fs-5 p-3'>
+        <i class='bi bi-star-fill text-warning'></i> 
+        $avg_rating / 5 
+        <span class='text-muted'>(Based on {$rating_data['total_reviews']} reviews)</span>
+      </span>
+    </div>";
+  }
+?>
+
 <div class="container mt-5">
    <!-- Swiper -->
   <div class="swiper swiper-testimonials">
     <div class="swiper-wrapper mb-5">
-      <div class="swiper-slide bg-white p-4">
-        <div class="profile d-flex align-items-center mb-3">
-          <img src="images/features/wifi.svg" width="30px">
-          <h6 class="m-0 ms-2">Random user1</h6>
-        </div>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-          Totam necessitatibus ducimus explicabo.
-        </p>
-        <div class="rating">
-          <i class="bi bi-star-fill text-warning"></i>
-          <i class="bi bi-star-fill text-warning"></i>
-          <i class="bi bi-star-fill text-warning"></i>
-          <i class="bi bi-star-fill text-warning"></i> 
-        </div>
-      </div>
-
-        <div class="swiper-slide bg-white p-4">
-          <div class="profile d-flex align-items-center mb-3">
-            <img src="images/features/wifi.svg" width="30px">
-            <h6 class="m-0 ms-2">Random user1</h6>
-          </div>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Totam necessitatibus ducimus explicabo.
-          </p>
-          <div class="rating">
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i> 
-          </div>
-      </div>
-
-      <div class="swiper-slide bg-white p-4">
-        <div class="profile d-flex align-items-center mb-3">
-          <img src="images/features/wifi.svg" width="30px">
-          <h6 class="m-0 ms-2">Random user1</h6>
-        </div>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-          Totam necessitatibus ducimus explicabo.
-        </p>
-        <div class="rating">
-          <i class="bi bi-star-fill text-warning"></i>
-          <i class="bi bi-star-fill text-warning"></i>
-          <i class="bi bi-star-fill text-warning"></i>
-          <i class="bi bi-star-fill text-warning"></i> 
-        </div>
-      </div>
+      
+      <?php
+        // Fetch approved reviews with user and room details
+        $review_query = "SELECT r.*, u.name as user_name, u.profile as user_pic, rm.name as room_name 
+                         FROM reviews r 
+                         INNER JOIN user_cred u ON r.user_id = u.id 
+                         INNER JOIN rooms rm ON r.room_id = rm.id 
+                         WHERE r.review_status = 'approved' 
+                         ORDER BY r.rating DESC, r.created_at DESC 
+                         LIMIT 6";
+        
+        $review_res = mysqli_query($con, $review_query);
+        
+        if(mysqli_num_rows($review_res) > 0){
+          while($review = mysqli_fetch_assoc($review_res)){
+            // Generate star rating
+            $stars = "";
+            for($i = 1; $i <= 5; $i++){
+              if($i <= $review['rating']){
+                $stars .= "<i class='bi bi-star-fill text-warning'></i>";
+              } else {
+                $stars .= "<i class='bi bi-star text-warning'></i>";
+              }
+            }
+            
+            // Format date
+            $review_date = date("d M Y", strtotime($review['created_at']));
+            
+            // User profile image
+            $user_img = USERS_IMG_PATH . htmlspecialchars($review['user_pic']);
+            $user_name = htmlspecialchars($review['user_name']);
+            $room_name = htmlspecialchars($review['room_name']);
+            $review_text = htmlspecialchars($review['review']);
+            
+            echo <<<testimonial
+            <div class="swiper-slide bg-white p-4">
+              <div class="profile d-flex align-items-center mb-3">
+                <img src="$user_img" width="30px" height="30px" class="rounded-circle">
+                <div class="ms-2">
+                  <h6 class="m-0">$user_name</h6>
+                  <small class="text-muted">$room_name</small>
+                </div>
+              </div>
+              <p>$review_text</p>
+              <div class="rating mb-2">
+                $stars
+              </div>
+              <small class="text-muted">$review_date</small>
+            </div>
+            testimonial;
+          }
+        } else {
+          echo "<div class='swiper-slide bg-white p-4 text-center'>
+            <p class='text-muted'>No testimonials available yet.</p>
+          </div>";
+        }
+      ?>
 
     </div>
     <div class="swiper-pagination"></div>
   </div>
   <div class="col-lg-12 text-center mt-5">
     <a href="about us.php" class="btn btn-sm btn-outline-dark rounded-0 fw-bold shadow-none">Know More >>></a>
+  </div>
+</div>
+
+<!-- Management Team Section -->
+
+<h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">MANAGEMENT TEAM</h2>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <?php
+      // Fetch team members
+      $team_query = "SELECT * FROM `team_details` ORDER BY `sr_no` ASC";
+      $team_res = mysqli_query($con, $team_query);
+      
+      if(mysqli_num_rows($team_res) > 0){
+        while($team = mysqli_fetch_assoc($team_res)){
+          $team_name = htmlspecialchars($team['name']);
+          $team_picture = ABOUT_IMG_PATH . htmlspecialchars($team['picture']);
+          
+          echo <<<team
+          <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="card border-0 shadow text-center">
+              <img src="$team_picture" class="card-img-top" alt="$team_name">
+              <div class="card-body">
+                <h5 class="card-title">$team_name</h5>
+              </div>
+            </div>
+          </div>
+          team;
+        }
+      } else {
+        echo "<div class='col-12 text-center'>
+          <p class='text-muted'>Team details coming soon.</p>
+        </div>";
+      }
+    ?>
   </div>
 </div>
 
@@ -442,6 +508,20 @@
   ?>
 
   <script>
+
+    // Set minimum date for check-in (today)
+    let today = new Date().toISOString().split('T')[0];
+    document.getElementById('checkin').setAttribute('min', today);
+    
+    // Validate check-out date
+    document.getElementById('checkin').addEventListener('change', function() {
+      let checkin = this.value;
+      let checkout = document.getElementById('checkout');
+      checkout.setAttribute('min', checkin);
+      if(checkout.value && checkout.value <= checkin) {
+        checkout.value = '';
+      }
+    });
 
     var swiper = new Swiper(".swiper-container", {
       spaceBetween: 30,

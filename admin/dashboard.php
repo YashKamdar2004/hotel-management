@@ -1,6 +1,48 @@
 <?php
     require('inc/essentials.php');
+    require('inc/db_config.php');
     adminLogin(); 
+
+    // Fetch summary statistics
+    $total_users = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) as count FROM user_cred"))['count'];
+    $total_rooms = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) as count FROM rooms WHERE status = 1"))['count'];
+    $total_bookings = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) as count FROM bookings"))['count'];
+    $total_revenue = mysqli_fetch_assoc(mysqli_query($con, "SELECT SUM(amount) as total FROM payments WHERE status = 'success' AND (refund_status IS NULL OR refund_status != 'refunded')"))['total'] ?? 0;
+    $pending_refunds = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) as count FROM bookings WHERE booking_status = 'refund_requested'"))['count'];
+    $total_reviews = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) as count FROM reviews WHERE review_status = 'approved'"))['count'];
+
+    // Booking statistics
+    $pending_bookings = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) as count FROM bookings WHERE booking_status = 'pending'"))['count'];
+    $confirmed_bookings = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) as count FROM bookings WHERE booking_status = 'confirmed'"))['count'];
+    $completed_bookings = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) as count FROM bookings WHERE booking_status = 'completed'"))['count'];
+    $cancelled_bookings = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) as count FROM bookings WHERE booking_status = 'cancelled'"))['count'];
+
+    // Monthly revenue for last 6 months
+    $revenue_query = "SELECT DATE_FORMAT(b.created_at, '%b %Y') as month, SUM(p.amount) as revenue 
+                      FROM payments p
+                      INNER JOIN bookings b ON p.booking_id = b.id
+                      WHERE p.status = 'success'
+                      AND (p.refund_status IS NULL OR p.refund_status != 'refunded')
+                      AND b.created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+                      GROUP BY YEAR(b.created_at), MONTH(b.created_at)
+                      ORDER BY b.created_at ASC";
+    $revenue_result = mysqli_query($con, $revenue_query);
+    $months = [];
+    $revenues = [];
+    while($row = mysqli_fetch_assoc($revenue_result)) {
+        $months[] = $row['month'];
+        $revenues[] = $row['revenue'];
+    }
+
+    // Recent bookings
+    $recent_bookings_query = "SELECT b.id, u.name as user_name, r.name as room_name, b.total_amount, 
+                              b.booking_status, b.payment_status, b.created_at
+                              FROM bookings b
+                              INNER JOIN user_cred u ON b.user_id = u.id
+                              INNER JOIN rooms r ON b.room_id = r.id
+                              ORDER BY b.created_at DESC
+                              LIMIT 5";
+    $recent_bookings = mysqli_query($con, $recent_bookings_query);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,6 +51,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Dashboard</title>
     <?php require('inc/links.php'); ?>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-light">
     
@@ -17,11 +60,274 @@
     <div class="container-fluid" id="main-content">
         <div class="row">
             <div class="col-lg-10 ms-auto p-4">
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vel delectus voluptatum neque dolorem eveniet autem! Veritatis fugiat soluta fuga, ullam odio ad excepturi sequi repellat saepe in omnis labore nisi deserunt ex ratione natus laudantium, aliquam earum sint quaerat temporibus consectetur cupiditate aspernatur! Explicabo inventore, eum quisquam provident optio asperiores blanditiis necessitatibus deserunt ipsa. Nostrum quasi tempore doloremque amet! Sed laudantium harum eaque quidem accusamus iure, quo velit mollitia rerum perspiciatis, modi reprehenderit dignissimos? Optio impedit sequi eveniet eum cupiditate unde tempora quasi, porro, quae fuga voluptates mollitia quam molestias hic magni earum ipsa? Molestias nihil assumenda nisi doloribus quidem modi quae consequuntur ipsum, tenetur aliquam perspiciatis, saepe nobis dolores non vel officia sint enim corporis, reiciendis consequatur? Sapiente nihil cumque sed molestiae nesciunt nisi numquam similique reprehenderit veniam, distinctio voluptate fugit laborum dolore hic repellat voluptatem, veritatis minus! Perferendis dolore quidem cupiditate sit laboriosam ut saepe earum aperiam! Mollitia earum maxime animi sit dicta? Error labore ut quam deserunt unde vero ducimus est neque modi illum eius, distinctio reiciendis suscipit repellendus! Vitae sapiente omnis iure? Illo soluta dolor fugit asperiores maxime sint. A corporis distinctio numquam, labore quod amet ex sint ea cum nemo odio impedit consectetur. Illum, eius. A ratione libero quidem? Quos autem magnam, voluptatum facilis, veniam quo ad maxime eaque ducimus, repudiandae excepturi omnis. Expedita, magni. Sequi similique doloremque est incidunt cum vero consequatur necessitatibus consequuntur nam quisquam praesentium eveniet veritatis laboriosam deleniti cupiditate, ratione impedit repellendus consectetur eos temporibus iure quam animi. Voluptatum illum perspiciatis, autem doloribus eveniet assumenda ab corporis necessitatibus delectus libero repudiandae recusandae sequi commodi exercitationem inventore ducimus quisquam neque nesciunt fuga adipisci ipsa. Debitis eligendi eaque, amet rem soluta quidem architecto distinctio cum, iusto iure at aliquam tenetur voluptate voluptatem, ea vero quos maxime? Quam excepturi tempore atque quis sit obcaecati sunt veritatis! Eos ex asperiores ut praesentium necessitatibus est nobis! Culpa et quasi obcaecati, aut, debitis asperiores voluptas velit ducimus minus molestiae quisquam doloremque adipisci incidunt! Aspernatur atque quas dolores quibusdam. Molestiae, repellendus! Ut officiis vero sunt molestiae. Quae est beatae facilis. Dolores, fugit. Nisi nesciunt neque exercitationem earum qui rerum? Maiores nesciunt dolorem deserunt repellat reiciendis hic ullam voluptatibus distinctio? Quam similique dignissimos temporibus non et officiis ex dicta deleniti quae aliquid tempora voluptatum, ut voluptatem quidem facere numquam commodi. Voluptas sequi rem, assumenda impedit et, obcaecati iste in error architecto repellendus quidem, quod asperiores consequatur similique beatae fuga nesciunt? Molestias corporis iste cupiditate vero cum explicabo commodi, laboriosam repellendus similique saepe esse quod quasi voluptates fuga libero non magni obcaecati odio ea odit, sapiente adipisci possimus praesentium aperiam! Aut voluptatum neque in ad. Itaque, laborum officiis eaque odit delectus, consectetur at perferendis repellendus ad veniam assumenda temporibus eum? Tenetur, nobis. Suscipit porro ea numquam, odio esse dolorem ex, voluptas asperiores quod inventore sapiente delectus, blanditiis sunt quasi quo excepturi quaerat aperiam dolor. Quibusdam maiores molestias eius magni et consequatur ad non, ipsum rerum quam blanditiis autem illo, consectetur dolore delectus quos voluptas placeat illum! Tempora libero, rem odio quia nisi porro sequi hic incidunt excepturi ullam id in sint saepe omnis dolorum expedita voluptatibus quas nam eligendi dicta cupiditate aspernatur. Itaque vitae ab molestiae at eaque. Quo aspernatur perspiciatis assumenda, consequuntur magnam quos, vero et, alias atque eligendi ea dolorem quia consectetur. Aspernatur impedit natus odit tempore maxime quae id at, sapiente accusamus assumenda odio. Expedita ad rerum enim hic id. Aspernatur odio tenetur quia eligendi. Modi qui iste, omnis quam commodi est inventore vel velit eligendi blanditiis quas voluptatum harum, sit culpa asperiores earum perspiciatis eum doloribus eveniet voluptates dicta quod dignissimos necessitatibus illum! Atque officia, vitae debitis consequuntur eaque error accusamus natus quam odit aliquam nobis officiis at excepturi! Voluptate, reprehenderit. Voluptatem laudantium quidem suscipit quia, recusandae, adipisci unde, accusamus nesciunt ipsum maiores laboriosam atque ipsam cum facilis vel qui facere deserunt corrupti error reprehenderit quo obcaecati. Repellendus veniam ducimus vero perspiciatis dignissimos. Quam ea vel beatae corrupti nemo quae dignissimos iusto magnam in aliquam, tenetur omnis perspiciatis nisi odio. Illum beatae quod iusto, vero, neque necessitatibus quaerat, numquam reiciendis recusandae magni in facilis. Suscipit, et voluptas, sint eveniet quos laudantium dolore dolores, beatae perferendis deserunt sed. Assumenda quae necessitatibus deleniti, voluptatum eligendi non ducimus tenetur perferendis labore iusto sint eius natus, beatae quod veniam laudantium maxime in quo nihil perspiciatis veritatis! Corrupti, cupiditate repellendus nostrum nemo quo et necessitatibus ut doloremque consequuntur, ipsa voluptatum tenetur obcaecati nam atque deleniti porro nulla a quisquam. Ullam eligendi voluptas neque? Laborum tempore rem dolore nihil odit. Quos saepe cupiditate cum distinctio obcaecati animi commodi accusamus a esse quibusdam veniam sint ipsum dolorum quasi nobis eaque harum porro, amet voluptate laborum nemo ea beatae? Consequatur earum recusandae, ab a nam aut aliquam maxime amet magnam sequi, veniam corrupti magni aliquid quae numquam architecto laboriosam eius officiis? Quia hic corrupti dignissimos nulla incidunt laboriosam aperiam at magni voluptas eius ex, earum sapiente ad culpa! Laudantium architecto illo id impedit labore rerum, recusandae ipsa! Ab laudantium sit adipisci pariatur molestiae eos ad amet in voluptates dolore vel distinctio, magnam, nulla aut! Ab rerum voluptatibus placeat ducimus sunt sed sapiente saepe similique nobis, animi, recusandae voluptatem autem impedit accusantium eum, commodi voluptate labore a. Autem, praesentium laborum molestias temporibus beatae cum ad vero voluptatem, rem culpa rerum architecto quod odio accusantium porro deleniti tempore aliquam quia at ut eaque reprehenderit amet iure. Minima assumenda id ex error magni saepe quaerat corporis laboriosam itaque molestias sit perspiciatis aut quibusdam nesciunt quae ipsa consequatur cumque voluptatem, est a! Quo necessitatibus dolor voluptas alias eos eligendi aliquid ipsa atque labore dolore, maiores doloremque temporibus illo voluptatibus incidunt praesentium repellat optio amet rem! Debitis cumque doloremque dolor quaerat neque, iste voluptas! Laborum quo odit facere quos deserunt dolorem quidem ullam magnam voluptatibus id! Accusantium, blanditiis! Ullam tenetur delectus quam nisi, eum ducimus deleniti est blanditiis aspernatur explicabo obcaecati neque dolores dicta amet alias sunt laboriosam, asperiores expedita corporis autem. Sapiente nostrum vero error, incidunt esse quibusdam iure aut consequuntur aliquam eveniet! Quia nisi ipsa modi sunt repudiandae voluptates dignissimos distinctio magnam recusandae eos tempore, maxime voluptate sed non id blanditiis rerum quas numquam enim? Expedita error explicabo provident non voluptas at iste temporibus animi eos, minus quidem! Nesciunt facere inventore quasi minima, eius dolore enim, quia magni ut tempore deserunt ipsum consectetur dolor repudiandae nobis. Quasi veniam quisquam explicabo, ullam vero deserunt, beatae reiciendis enim vel ut, atque esse doloribus aliquid optio quia amet officiis. Eos possimus hic quas libero corporis provident dolore, nam soluta ipsam velit, culpa porro nisi aliquid. Mollitia iusto reprehenderit, sunt dicta aliquid dolore temporibus ratione eaque eligendi doloribus ullam numquam id placeat suscipit quas porro earum possimus provident nihil repellendus nemo? Id asperiores ipsum qui earum voluptatem at nisi. Amet obcaecati dolorum nostrum molestiae! Quae corrupti possimus omnis nisi, eveniet quasi inventore quam consectetur consequuntur voluptas et, id sint vel voluptates quaerat! Perspiciatis est enim nesciunt rem debitis illum tempora! Nostrum omnis similique ducimus sed maiores, eum sint optio error doloribus, aperiam quam officia cum iure non labore. Itaque neque at expedita explicabo natus ab accusamus! Reiciendis, dolor repellendus obcaecati nemo consequuntur odit totam tempore! Nam iure aliquid, eligendi error temporibus officia animi quasi, rem quaerat aut minima dolorem ab soluta explicabo aspernatur consectetur cumque exercitationem recusandae culpa distinctio quas! Eaque sapiente optio laborum sit cum facere modi ex unde nisi accusamus aliquam, quas reprehenderit quasi dolores. Veniam praesentium quia distinctio consequatur laudantium provident facilis quam, quos, quod quaerat obcaecati nulla sed saepe quo odio cum assumenda? Cum consectetur saepe sequi iste vero totam, ipsa, illum velit vel modi aut in aperiam beatae minus cumque et nihil nam? Sapiente, fuga veniam? Nobis quaerat aliquid libero corporis vero, placeat neque ex nam rem quod pariatur voluptates porro voluptatum voluptas inventore vel eaque laboriosam temporibus? Deleniti recusandae ut numquam impedit ea, accusamus explicabo qui magni quos ab! Neque doloremque odio dolorum totam similique, veniam aut quisquam consectetur itaque deleniti ipsum facilis dolore? Nesciunt, ipsum recusandae vitae repudiandae corporis corrupti eveniet? Saepe, unde reprehenderit perferendis voluptas reiciendis velit sed qui voluptatem nostrum dignissimos quo sapiente eius. Provident sapiente aut ut non laborum tempore optio eveniet ipsam, error facilis, illum similique. Ipsa distinctio ad veritatis ipsam nisi nulla voluptas aperiam minima temporibus impedit est recusandae velit doloribus ducimus, dignissimos adipisci fugit eum quo exercitationem delectus voluptates expedita iusto placeat. Quidem, voluptatem excepturi voluptas rerum vero alias expedita et quos aut natus ad? Accusantium laboriosam impedit dolore similique sit. Necessitatibus possimus unde culpa iure ducimus impedit deleniti, perferendis aliquam distinctio, pariatur, cum dolor? Corporis corrupti sit eius odio distinctio aperiam, natus, sed laudantium aut obcaecati reprehenderit voluptatum velit laboriosam vero quo, rerum cupiditate optio at eligendi aspernatur quaerat doloribus. Odio excepturi minima officia adipisci repellendus facilis rem, ipsam consequuntur repellat cumque quas veritatis porro corrupti dolores possimus minus sit necessitatibus et voluptatum nihil magni quae. Est voluptatem id, vel, beatae dolore aliquam nesciunt, reiciendis odit eveniet repellat neque atque vero nobis praesentium illum error. Tempora, repellendus delectus illum saepe praesentium neque minus totam? Eaque quia nam ea veniam facere inventore sed, ipsam aspernatur saepe nobis reprehenderit iste, temporibus amet maiores adipisci cum numquam consectetur aliquid, modi alias architecto culpa tempore? At necessitatibus ea minus eius dolorum neque quasi odio aliquam obcaecati. Incidunt, dolorum vero voluptates nobis aperiam sint? Ab et nulla minima corrupti excepturi enim nisi! Sequi, illo. Ab dolorem voluptatum quae, sed explicabo reprehenderit laboriosam, nisi, eaque libero corporis corrupti mollitia quaerat consequatur exercitationem nobis deleniti? Blanditiis placeat dolores nesciunt sit aperiam assumenda quod et, dicta iusto dignissimos unde odio facere dolorem ea nisi ipsum, rem quis ut tempora vero voluptatibus necessitatibus est? Veniam aperiam aliquam vel asperiores iusto amet magni officiis laudantium recusandae, ipsa earum eaque distinctio, in illo dicta repellat illum quae veritatis optio inventore? Incidunt, asperiores explicabo! Nam, explicabo totam aspernatur atque porro nostrum ipsa assumenda laboriosam odio vel consequatur voluptatibus id ut facere soluta quasi delectus. Optio exercitationem molestiae natus nisi nostrum maxime similique et officiis doloribus voluptatem fugiat aliquam, itaque animi enim blanditiis! Optio vel excepturi eligendi libero laboriosam, eius facilis, voluptates ullam quas explicabo aut, magnam odio totam possimus laudantium quo atque laborum inventore neque enim! Sequi voluptas suscipit, itaque eum qui tempora eaque repudiandae beatae cupiditate porro architecto atque laboriosam repellat velit nisi dolorum sunt, quia inventore magnam eos necessitatibus debitis! Tenetur sequi inventore reprehenderit quidem modi aliquam incidunt obcaecati nulla libero veritatis similique laborum nam beatae quod, magnam, maxime nobis autem culpa, repellendus doloremque natus dolore vel. Voluptate debitis veritatis cumque fugiat ducimus. Iusto et fugit ex. Odit ab distinctio quae praesentium accusantium. Facilis nulla natus temporibus nisi corporis, libero iure eveniet placeat nihil perspiciatis fuga dolorem at alias eaque vero distinctio odio vel voluptates consequatur dolor quam hic sit unde pariatur? Explicabo enim corporis, quae aperiam minus officiis tempore velit harum delectus! Reprehenderit est, mollitia facere explicabo magni dignissimos dolores deserunt eum similique eaque distinctio animi libero. Iure fugit, inventore deleniti minima quasi qui deserunt obcaecati cupiditate, impedit doloremque sint officiis nemo et neque repellat! Laboriosam facilis animi ad maxime, veniam expedita. Facere distinctio laborum molestias temporibus, consequatur rem sit placeat quasi quos explicabo perferendis, assumenda impedit incidunt eos laudantium ipsa voluptatem officiis excepturi? Temporibus dolores, soluta quas veniam illo inventore nostrum a. Architecto minus, fugiat laboriosam asperiores sunt nemo, consequuntur illo odit et harum, vel vitae nihil eveniet similique repudiandae debitis nisi. Sit, voluptate eos et in nobis dolore. Explicabo doloribus molestias porro quibusdam magni ad dolore a fugit eveniet obcaecati id sed suscipit officiis, similique quisquam mollitia. Magnam debitis iusto non, consequatur commodi inventore vitae, voluptatem eligendi pariatur eaque quo quis adipisci? Dicta, libero? Dolorum voluptate laudantium neque, a quis autem illum nostrum rem pariatur dignissimos sed, ex error ipsum incidunt? Velit quo suscipit ducimus vero alias exercitationem nisi, ea temporibus dolor molestiae voluptatum quidem quasi delectus doloribus sapiente laudantium eos, voluptates blanditiis, quibusdam corporis totam reiciendis illum sed corrupti! Beatae ipsam assumenda animi perferendis dolore blanditiis, doloremque quam voluptatem molestiae. Unde molestiae aperiam aspernatur at voluptatibus fuga, esse commodi doloremque rerum ex non!
+                <h3 class="mb-4">DASHBOARD</h3>
+
+                <!-- Summary Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white bg-primary shadow">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title mb-0">Total Users</h6>
+                                        <h2 class="mb-0"><?php echo $total_users; ?></h2>
+                                    </div>
+                                    <i class="bi bi-people fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white bg-info shadow">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title mb-0">Total Rooms</h6>
+                                        <h2 class="mb-0"><?php echo $total_rooms; ?></h2>
+                                    </div>
+                                    <i class="bi bi-door-open fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white bg-warning shadow">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title mb-0">Total Bookings</h6>
+                                        <h2 class="mb-0"><?php echo $total_bookings; ?></h2>
+                                    </div>
+                                    <i class="bi bi-calendar-check fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white bg-success shadow">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title mb-0">Total Revenue</h6>
+                                        <h2 class="mb-0">₹<?php echo number_format($total_revenue, 2); ?></h2>
+                                    </div>
+                                    <i class="bi bi-currency-rupee fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white bg-danger shadow">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title mb-0">Pending Refunds</h6>
+                                        <h2 class="mb-0"><?php echo $pending_refunds; ?></h2>
+                                    </div>
+                                    <i class="bi bi-exclamation-triangle fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white bg-secondary shadow">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="card-title mb-0">Total Reviews</h6>
+                                        <h2 class="mb-0"><?php echo $total_reviews; ?></h2>
+                                    </div>
+                                    <i class="bi bi-star fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <div class="card shadow">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">Booking Statistics</h5>
+                                <div class="row text-center">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="border rounded p-3">
+                                            <h6 class="text-muted">Pending</h6>
+                                            <h3 class="text-warning"><?php echo $pending_bookings; ?></h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="border rounded p-3">
+                                            <h6 class="text-muted">Confirmed</h6>
+                                            <h3 class="text-info"><?php echo $confirmed_bookings; ?></h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="border rounded p-3">
+                                            <h6 class="text-muted">Completed</h6>
+                                            <h3 class="text-success"><?php echo $completed_bookings; ?></h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="border rounded p-3">
+                                            <h6 class="text-muted">Cancelled</h6>
+                                            <h3 class="text-danger"><?php echo $cancelled_bookings; ?></h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">Booking Overview</h5>
+                                <canvas id="bookingPieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue Chart -->
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Monthly Revenue (Last 6 Months)</h5>
+                        <canvas id="revenueChart" height="80"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Bookings -->
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Recent Bookings</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Booking ID</th>
+                                        <th>User Name</th>
+                                        <th>Room Name</th>
+                                        <th>Amount</th>
+                                        <th>Booking Status</th>
+                                        <th>Payment Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php 
+                                    if(mysqli_num_rows($recent_bookings) > 0) {
+                                        while($booking = mysqli_fetch_assoc($recent_bookings)) {
+                                            $booking_badge = '';
+                                            switch($booking['booking_status']) {
+                                                case 'pending': $booking_badge = 'bg-warning'; break;
+                                                case 'confirmed': $booking_badge = 'bg-info'; break;
+                                                case 'completed': $booking_badge = 'bg-success'; break;
+                                                case 'cancelled': $booking_badge = 'bg-danger'; break;
+                                                case 'refund_requested': $booking_badge = 'bg-warning'; break;
+                                                default: $booking_badge = 'bg-secondary';
+                                            }
+                                            
+                                            $payment_badge = $booking['payment_status'] == 'paid' ? 'bg-success' : 'bg-warning';
+                                            
+                                            echo "<tr>
+                                                <td>#{$booking['id']}</td>
+                                                <td>{$booking['user_name']}</td>
+                                                <td>{$booking['room_name']}</td>
+                                                <td>₹" . number_format($booking['total_amount'], 2) . "</td>
+                                                <td><span class='badge {$booking_badge}'>{$booking['booking_status']}</span></td>
+                                                <td><span class='badge {$payment_badge}'>{$booking['payment_status']}</span></td>
+                                                <td>" . date('d M Y', strtotime($booking['created_at'])) . "</td>
+                                            </tr>";
+                                        }
+                                    } else {
+                                        echo "<tr><td colspan='7' class='text-center'>No bookings found</td></tr>";
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
     <?php require('inc/scripts.php');?>
+
+    <script>
+        // Booking Pie Chart
+        const pieCtx = document.getElementById('bookingPieChart').getContext('2d');
+        const bookingPieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Completed', 'Cancelled', 'Confirmed', 'Pending'],
+                datasets: [{
+                    data: [<?php echo $completed_bookings; ?>, <?php echo $cancelled_bookings; ?>, <?php echo $confirmed_bookings; ?>, <?php echo $pending_bookings; ?>],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.8)',
+                        'rgba(220, 53, 69, 0.8)',
+                        'rgba(23, 162, 184, 0.8)',
+                        'rgba(255, 193, 7, 0.8)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Revenue Chart
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: <?php echo json_encode($months); ?>,
+                datasets: [{
+                    label: 'Revenue (₹)',
+                    data: <?php echo json_encode($revenues); ?>,
+                    backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₹' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Revenue: ₹' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
 </body>
 </html>

@@ -99,7 +99,7 @@
       <div class="col-lg-5 col-md-12 px-4">
         <div class="card mb-4 border-0 shadow-sm rounded-3">
           <div class="card-body">
-            <form action="#" method="post" id="booking_form">
+            <form action="pay_now.php" method="post" id="booking_form">
               <h6 class="mb-3">BOOKING DETAILS</h6>
               <div class="row">
                 <div class="col-md-6 mb-3">
@@ -203,8 +203,6 @@
     }
 
 
-
-
     booking_form.elements['pay_now'].addEventListener('click', function(){
 
         let checkin = booking_form.elements['checkin'].value;
@@ -220,11 +218,7 @@
           return;
         }
 
-        window.location.href = 
-          "payment.php?amount=" + total_amount +
-          "&room_id=<?php echo $room_data['id']; ?>" +
-          "&checkin=" + checkin +
-          "&checkout=" + checkout;
+        booking_form.submit();
       });
     
   </script>

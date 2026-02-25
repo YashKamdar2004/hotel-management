@@ -1,84 +1,101 @@
-<?php
-session_start();
-
-// If user directly tries to access page
-if (!isset($_GET['amount']) || !isset($_GET['room_id'])
-|| !isset($_GET['checkin']) || !isset($_GET['checkout'])) {
-    header("Location: index.php");
-    exit;
-}
-
-$amount = $_GET['amount'];
-$room_id = $_GET['room_id'];
-$checkin = $_GET['checkin'];
-$checkout = $_GET['checkout'];
-// Use IDs passed from payment page if available, otherwise generate new ones
-if (isset($_GET['booking_id']) && isset($_GET['txn_id'])) {
-    $booking_id = $_GET['booking_id'];
-    $txn_id = $_GET['txn_id'];
-}
-else {
-    $booking_id = "HB" . rand(10000, 99999);
-    $txn_id = "TXN" . rand(100000, 999999);
-}
-?>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Booking Confirmed</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        body{
-            background: linear-gradient(135deg, #28a745, #218838);
-        }
-        .success-card{
-            max-width:600px;
-            margin:80px auto;
-            background:white;
-            padding:30px;
-            border-radius:15px;
-            box-shadow:0 15px 35px rgba(0,0,0,0.2);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <?php require('inc/links.php'); ?>
+  <title><?php echo $settings_r['site_title'] ?> - BOOKING SUCCESS</title>
 </head>
 
-<body>
+<body class="bg-light">
 
-<div class="success-card text-center">
+  <?php 
+    require('inc/header.php');
+    
+    if(!isset($_GET['transaction_id'])){
+      redirect('index.php');
+    }
+    
+    $transaction_id = $_GET['transaction_id'];
+    
+    // Fetch payment and booking details
+    $payment_res = select("SELECT p.*, b.*, r.name as room_name 
+                          FROM `payments` p 
+                          INNER JOIN `bookings` b ON p.booking_id = b.id 
+                          INNER JOIN `rooms` r ON b.room_id = r.id 
+                          WHERE p.transaction_id = ? AND b.user_id = ?", 
+                          [$transaction_id, $_SESSION['uId']], "si");
+    
+    if(mysqli_num_rows($payment_res) == 0){
+      redirect('index.php');
+    }
+    
+    $data = mysqli_fetch_assoc($payment_res);
+  ?>
 
-    <h2 class="text-success mb-3">🎉 Booking Confirmed!</h2>
-
-    <p class="lead">Your payment was successful.</p>
-
-    <hr>
-
-    <div class="text-start mt-4">
-
-        <p><strong>Booking ID:</strong> <?php echo $booking_id; ?></p>
-        <p><strong>Transaction ID:</strong> <?php echo $txn_id; ?></p>
-        <p><strong>Room ID:</strong> <?php echo $room_id; ?></p>
-        <p><strong>Check-in Date:</strong> <?php echo $checkin; ?></p>
-        <p><strong>Check-out Date:</strong> <?php echo $checkout; ?></p>
-        <p><strong>Amount Paid:</strong> ₹<?php echo $amount; ?></p>
-
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        
+        <div class="card shadow-sm text-center">
+          <div class="card-body p-5">
+            <div class="mb-4">
+              <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+            </div>
+            
+            <h2 class="text-success mb-3">Payment Successful!</h2>
+            <p class="text-muted mb-4">Your booking is pending admin approval</p>
+            
+            <div class="alert alert-success">
+              <strong>Transaction ID:</strong> <?php echo $data['transaction_id']; ?>
+            </div>
+            
+            <hr>
+            
+            <div class="text-start mt-4">
+              <h5 class="mb-3">Booking Details</h5>
+              <div class="row mb-2">
+                <div class="col-6"><strong>Booking ID:</strong></div>
+                <div class="col-6">#<?php echo $data['booking_id']; ?></div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-6"><strong>Room:</strong></div>
+                <div class="col-6"><?php echo $data['room_name']; ?></div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-6"><strong>Guest Name:</strong></div>
+                <div class="col-6"><?php echo $data['name']; ?></div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-6"><strong>Check-in:</strong></div>
+                <div class="col-6"><?php echo date('d M Y', strtotime($data['checkin'])); ?></div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-6"><strong>Check-out:</strong></div>
+                <div class="col-6"><?php echo date('d M Y', strtotime($data['checkout'])); ?></div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-6"><strong>Amount Paid:</strong></div>
+                <div class="col-6 text-success fw-bold">₹<?php echo $data['amount']; ?></div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-6"><strong>Payment Method:</strong></div>
+                <div class="col-6 text-capitalize"><?php echo $data['payment_method']; ?></div>
+              </div>
+            </div>
+            
+            <div class="mt-4">
+              <a href="index.php" class="btn btn-primary me-2">Go to Home</a>
+              <a href="rooms.php" class="btn btn-outline-secondary">Book Another Room</a>
+            </div>
+          </div>
+        </div>
+        
+      </div>
     </div>
+  </div>
 
-    <div class="mt-4">
-        <button onclick="window.print()" class="btn btn-outline-primary me-2">
-            Print Invoice
-        </button>
-
-        <a href="index.php" class="btn btn-success">
-            Go to Home
-        </a>
-    </div>
-
-</div>
+  <?php require('inc/footer.php'); ?>
 
 </body>
 </html>

@@ -14,7 +14,7 @@
             $fetch = mysqli_fetch_assoc($query);
 
             if($fetch['is_verified'] == 1){
-                echo "<script>alert('Email alreadt verified!')</script>";
+                echo "<script>alert('Email already verified!')</script>";
             }
             else{
                 $update = update("UPDATE `user_cred` SET `is_verified`=? WHERE `id`=?",[1,$fetch['id']],'ii');
