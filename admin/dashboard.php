@@ -17,21 +17,29 @@
     $completed_bookings = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) as count FROM bookings WHERE booking_status = 'completed'"))['count'];
     $cancelled_bookings = mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) as count FROM bookings WHERE booking_status = 'cancelled'"))['count'];
 
-    // Monthly revenue for last 6 months
-    $revenue_query = "SELECT DATE_FORMAT(b.created_at, '%b %Y') as month, SUM(p.amount) as revenue 
-                      FROM payments p
-                      INNER JOIN bookings b ON p.booking_id = b.id
-                      WHERE p.status = 'success'
-                      AND (p.refund_status IS NULL OR p.refund_status != 'refunded')
-                      AND b.created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
-                      GROUP BY YEAR(b.created_at), MONTH(b.created_at)
-                      ORDER BY b.created_at ASC";
-    $revenue_result = mysqli_query($con, $revenue_query);
+    // Monthly revenue for last 6 months - Generate all 6 months first
     $months = [];
     $revenues = [];
-    while($row = mysqli_fetch_assoc($revenue_result)) {
-        $months[] = $row['month'];
-        $revenues[] = $row['revenue'];
+    
+    // Generate last 6 months
+    for($i = 5; $i >= 0; $i--) {
+        $month_date = date('Y-m-01', strtotime("-$i months"));
+        $month_label = date('M Y', strtotime($month_date));
+        $months[] = $month_label;
+        
+        // Get revenue for this specific month
+        $year = date('Y', strtotime($month_date));
+        $month = date('m', strtotime($month_date));
+        
+        $revenue_query = "SELECT COALESCE(SUM(b.total_amount), 0) as revenue 
+                          FROM bookings b
+                          WHERE b.payment_status = 'paid'
+                          AND YEAR(b.created_at) = $year
+                          AND MONTH(b.created_at) = $month";
+        
+        $revenue_result = mysqli_query($con, $revenue_query);
+        $revenue_row = mysqli_fetch_assoc($revenue_result);
+        $revenues[] = (float)$revenue_row['revenue'];
     }
 
     // Recent bookings

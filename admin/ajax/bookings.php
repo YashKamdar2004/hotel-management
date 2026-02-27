@@ -139,6 +139,34 @@
         }
     }
 
+    if(isset($_POST['accept_refund']))
+    {
+        $frm_data = filteration($_POST);
+
+        $q = "UPDATE `bookings` SET `booking_status`='cancelled', `payment_status`='refunded' WHERE `id`=?";
+        $v = [$frm_data['accept_refund']];
+
+        if(update($q, $v, 'i')){
+            echo 1;
+        } else {
+            echo 0;
+        }
+    }
+
+    if(isset($_POST['reject_refund']))
+    {
+        $frm_data = filteration($_POST);
+
+        $q = "UPDATE `bookings` SET `booking_status`='confirmed' WHERE `id`=?";
+        $v = [$frm_data['reject_refund']];
+
+        if(update($q, $v, 'i')){
+            echo 1;
+        } else {
+            echo 0;
+        }
+    }
+
     if(isset($_POST['search_booking']))
     {   
         $frm_data = filteration($_POST);

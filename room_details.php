@@ -103,14 +103,33 @@
                 <h4>₹$room_data[price] per night</h4>
               price;
 
-              echo <<<rating
-                <div class="mb-3">
-                  <i class="bi bi-star-fill text-warning"></i>
-                  <i class="bi bi-star-fill text-warning"></i>
-                  <i class="bi bi-star-fill text-warning"></i>
-                  <i class="bi bi-star-fill text-warning"></i> 
-                </div>
-              rating;
+              // Calculate average rating
+              $rating_q = mysqli_query($con, "SELECT AVG(rating) as avg_rating, COUNT(*) as total_reviews 
+                FROM reviews WHERE room_id = '$room_data[id]' AND review_status = 'approved'");
+              $rating_data = mysqli_fetch_assoc($rating_q);
+              $avg_rating = round($rating_data['avg_rating'], 1);
+              $total_reviews = $rating_data['total_reviews'];
+
+              // Display stars
+              $rating_html = "";
+              for($i = 1; $i <= 5; $i++) {
+                if($i <= floor($avg_rating)) {
+                  $rating_html .= "<i class='bi bi-star-fill text-warning'></i>";
+                } else if($i == ceil($avg_rating) && $avg_rating - floor($avg_rating) >= 0.5) {
+                  $rating_html .= "<i class='bi bi-star-half text-warning'></i>";
+                } else {
+                  $rating_html .= "<i class='bi bi-star text-warning'></i>";
+                }
+              }
+
+              if($total_reviews > 0) {
+                echo <<<rating
+                  <div class="mb-3">
+                    $rating_html
+                    <span class="ms-2">($avg_rating / 5 - $total_reviews reviews)</span>
+                  </div>
+                rating;
+              }
 
               $fea_q = mysqli_query($con,"SELECT f.name FROM `features` f 
                 INNER JOIN `room_features` rfea ON f.id = rfea.features_id 
@@ -200,22 +219,42 @@
 
         <div>
           <h5 class="mb-3">Reviews & Rating</h5>
-          <div>
-            <div class="d-flex align-items-center mb-2">
-            <img src="images/features/wifi.svg" width="30px">
-            <h6 class="m-0 ms-2">Random user1</h6>
-          </div>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Totam necessitatibus ducimus explicabo.
-          </p>
-          <div class="rating">
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i>
-            <i class="bi bi-star-fill text-warning"></i> 
-          </div>
-          </div>
+          <?php
+            // Fetch approved reviews for this room
+            $review_q = mysqli_query($con, "SELECT r.*, u.name as user_name, u.profile as user_profile 
+              FROM reviews r 
+              INNER JOIN user_cred u ON r.user_id = u.id 
+              WHERE r.room_id = '$room_data[id]' AND r.review_status = 'approved' 
+              ORDER BY r.created_at DESC");
+
+            if(mysqli_num_rows($review_q) > 0) {
+              while($review = mysqli_fetch_assoc($review_q)) {
+                $stars = "";
+                for($i = 1; $i <= 5; $i++) {
+                  if($i <= $review['rating']) {
+                    $stars .= "<i class='bi bi-star-fill text-warning'></i>";
+                  } else {
+                    $stars .= "<i class='bi bi-star text-warning'></i>";
+                  }
+                }
+                
+                $user_img = USERS_IMG_PATH . $review['user_profile'];
+                
+                echo <<<review
+                  <div class="mb-4">
+                    <div class="d-flex align-items-center mb-2">
+                      <img src="$user_img" width="30px" class="rounded-circle">
+                      <h6 class="m-0 ms-2">$review[user_name]</h6>
+                    </div>
+                    <p>$review[review]</p>
+                    <div class="rating">$stars</div>
+                  </div>
+                review;
+              }
+            } else {
+              echo "<p class='text-muted'>No reviews yet. Be the first to review this room!</p>";
+            }
+          ?>
         </div>
       </div>
 

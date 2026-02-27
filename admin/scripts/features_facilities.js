@@ -140,6 +140,8 @@ function rem_facility(val)
     
     xhr.onload = function()
     {
+        console.log('Delete facility response:', this.responseText);
+        
         if(this.responseText == 1)
         {
             alert('success','Facility removed!');
@@ -150,7 +152,7 @@ function rem_facility(val)
         }
         else
         {
-            alert('error','Server down!');
+            alert('error','Server down! Response: ' + this.responseText);
         }
     }
 

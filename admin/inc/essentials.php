@@ -33,7 +33,21 @@ define('SENDGRID_EMAIL',$_ENV['SENDGRID_EMAIL']);
 define('SENDGRID_NAME',$_ENV['SENDGRID_NAME']);
 
 function adminLogin(){
-    session_start();
+    if(session_status() === PHP_SESSION_NONE) {
+        // Set session cookie parameters for better persistence
+        ini_set('session.cookie_lifetime', 86400); // 24 hours
+        ini_set('session.gc_maxlifetime', 86400);
+        session_start();
+    }
+    
+    // Regenerate session ID periodically to prevent fixation but keep session alive
+    if(!isset($_SESSION['last_regeneration'])) {
+        $_SESSION['last_regeneration'] = time();
+    } else if(time() - $_SESSION['last_regeneration'] > 1800) { // 30 minutes
+        session_regenerate_id(true);
+        $_SESSION['last_regeneration'] = time();
+    }
+    
     if(!(isset($_SESSION['adminLogin']) && $_SESSION['adminLogin']==true)){
         echo "<script>
             window.location.href='index.php';

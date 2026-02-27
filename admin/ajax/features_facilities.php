@@ -109,7 +109,7 @@
         $frm_data = filteration($_POST);
         $values = [$frm_data['rem_facility']];
 
-        $check_q = select('SELECT * FROM `room_facilities` WHERE `facilities_id`=?',[$frm_data['rem_facility    ']],'i');
+        $check_q = select('SELECT * FROM `room_facilities` WHERE `facilities_id`=?',[$frm_data['rem_facility']],'i');
 
         if(mysqli_num_rows($check_q) == 0)
         {

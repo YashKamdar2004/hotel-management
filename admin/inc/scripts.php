@@ -28,7 +28,10 @@ integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxV
 
     function remAlert()
     {
-        document.getElementsByClassName('alert')[0].remove();
+        let alerts = document.getElementsByClassName('alert');
+        if(alerts.length > 0) {
+            alerts[0].remove();
+        }
     }
 
     function setActive()

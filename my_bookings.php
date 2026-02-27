@@ -50,7 +50,7 @@
           <div class="card-body">
             
             <div class="table-responsive">
-              <table class="table table-hover border text-center" style="min-width: 1200px;">
+              <table class="table table-hover border text-center" style="min-width: 1300px;">
                 <thead>
                   <tr class="bg-dark text-light">
                     <th scope="col">#</th>
@@ -62,6 +62,7 @@
                     <th scope="col">Payment Status</th>
                     <th scope="col">Date</th>
                     <th scope="col">Action</th>
+                    <th scope="col">Invoice</th>
                   </tr>
                 </thead>
                 <tbody id="bookings-data">

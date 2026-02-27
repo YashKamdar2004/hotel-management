@@ -55,7 +55,7 @@ if(isset($_POST['get_bookings']))
         $action = "";
 
         if(($row['booking_status'] == 'pending' || $row['booking_status'] == 'confirmed') && $row['payment_status'] == 'paid'){
-            $action = "<button onclick='request_refund($row[id])' class='btn btn-warning btn-sm shadow-none'>
+            $action = "<button onclick='request_refund($row[id])' class='btn btn-warning btn-sm shadow-none mb-1'>
                 <i class='bi bi-arrow-counterclockwise'></i> Request Refund
             </button>";
         } else if($row['booking_status'] == 'refund_requested'){
@@ -64,7 +64,7 @@ if(isset($_POST['get_bookings']))
             // Check if review already submitted
             $review_check = select("SELECT * FROM `reviews` WHERE `booking_id` = ?", [$row['id']], 'i');
             if(mysqli_num_rows($review_check) == 0){
-                $action = "<button onclick='open_review_modal($row[id], $row[room_id])' class='btn btn-success btn-sm shadow-none'>
+                $action = "<button onclick='open_review_modal($row[id], $row[room_id])' class='btn btn-success btn-sm shadow-none mb-1'>
                     <i class='bi bi-star-fill'></i> Write Review
                 </button>";
             } else {
@@ -73,6 +73,11 @@ if(isset($_POST['get_bookings']))
         } else {
             $action = "<span class='text-muted'>No Action</span>";
         }
+        
+        // PDF download button in separate column
+        $pdf_btn = "<a href='generate_booking_pdf.php?id=$row[id]' class='btn btn-primary btn-sm shadow-none' target='_blank'>
+            <i class='bi bi-file-pdf'></i> Download
+        </a>";
 
         $data .= "
             <tr>
@@ -85,13 +90,14 @@ if(isset($_POST['get_bookings']))
                 <td>$payment_status</td>
                 <td>$date</td>
                 <td>$action</td>
+                <td>$pdf_btn</td>
             </tr>  
         ";
         $i++;
     }
 
     if(empty($data)){
-        $data = "<tr><td colspan='9' class='text-center'>No bookings found!</td></tr>";
+        $data = "<tr><td colspan='10' class='text-center'>No bookings found!</td></tr>";
     }
 
     echo $data; 
