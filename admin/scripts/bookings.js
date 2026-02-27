@@ -76,7 +76,7 @@ function accept_refund(id) {
   if (confirm("Accept this refund request? Amount will be refunded to customer.")) {
     let xhr = new XMLHttpRequest();
 
-    xhr.open("POST", "ajax/process_refund.php", true);
+    xhr.open("POST", "ajax/bookings.php", true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
     xhr.onload = function () {
@@ -96,7 +96,7 @@ function reject_refund(id) {
   if (confirm("Reject this refund request?")) {
     let xhr = new XMLHttpRequest();
 
-    xhr.open("POST", "ajax/process_refund.php", true);
+    xhr.open("POST", "ajax/bookings.php", true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
     xhr.onload = function () {

@@ -34,8 +34,14 @@ define('SENDGRID_NAME',$_ENV['SENDGRID_NAME']);
 
 function adminLogin(){
     if(session_status() === PHP_SESSION_NONE) {
-        // Set session cookie parameters for better persistence
-        ini_set('session.cookie_lifetime', 86400); // 24 hours
+        // Set session cookie parameters BEFORE starting session
+        session_set_cookie_params([
+            'lifetime' => 86400,  // 24 hours
+            'path' => '/',
+            'secure' => false,    // Set to true if using HTTPS
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
         ini_set('session.gc_maxlifetime', 86400);
         session_start();
     }

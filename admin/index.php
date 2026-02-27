@@ -2,7 +2,19 @@
     require('inc/essentials.php');
     require('inc/db_config.php');
 
-    session_start();
+    // Set session parameters before starting session
+    if(session_status() === PHP_SESSION_NONE) {
+        session_set_cookie_params([
+            'lifetime' => 86400,  // 24 hours
+            'path' => '/',
+            'secure' => false,
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+        ini_set('session.gc_maxlifetime', 86400);
+        session_start();
+    }
+    
     if((isset($_SESSION['adminLogin']) && $_SESSION['adminLogin']==true)){
         redirect('dashboard.php');
     }
