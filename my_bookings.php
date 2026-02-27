@@ -23,7 +23,7 @@
   </style>
 </head>
 
-<body class="bg-light">
+<body class="bg-light d-flex flex-column min-vh-100">
 
   <?php 
     require('inc/header.php');
@@ -33,7 +33,7 @@
     }
   ?>
 
-  <div class="container">
+  <div class="container flex-grow-1">
     <div class="row">
 
       <div class="col-12 my-5 px-4">
